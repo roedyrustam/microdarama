@@ -9,12 +9,12 @@ TOOLS_DIR = ROOT_DIR / "assets" / "tools"
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
-import bang_film_cli  # noqa: E402
+import microdrama_cli  # noqa: E402
 import check_prompts  # noqa: E402
 import dissect_video  # noqa: E402
 
 
-class TestBangFilmPrecision(unittest.TestCase):
+class TestMicrodramaPrecision(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()
         self.tmp_path = pathlib.Path(self.tmp.name)
@@ -168,7 +168,7 @@ class TestBangFilmPrecision(unittest.TestCase):
 
     def test_cli_init_add_ep_sync_and_board(self) -> None:
         new_proj = self.tmp_path / "proyek-uji"
-        rc = bang_film_cli.main(["init", str(new_proj), "--title", "Proyek Uji"])
+        rc = microdrama_cli.main(["init", str(new_proj), "--title", "Proyek Uji"])
         self.assertEqual(rc, 0)
         self.assertTrue((new_proj / "brief.md").exists())
         self.assertTrue((new_proj / "ep01" / "prompt-video.md").exists())
@@ -183,18 +183,18 @@ class TestBangFilmPrecision(unittest.TestCase):
             encoding="utf-8",
         )
         self.assertEqual(check_prompts.run_checks(cloned)["status"], "error")
-        self.assertEqual(bang_film_cli.main(["sync", str(cloned)]), 0)
+        self.assertEqual(microdrama_cli.main(["sync", str(cloned)]), 0)
         self.assertEqual(check_prompts.run_checks(cloned, strict=True)["status"], "ok")
 
         # Test add-ep on cloned project collects existing sheets/plates
-        self.assertEqual(bang_film_cli.main(["add-ep", str(cloned), "2", "--title", "Basement"]), 0)
+        self.assertEqual(microdrama_cli.main(["add-ep", str(cloned), "2", "--title", "Basement"]), 0)
         ep2_aset_txt = (cloned / "ep02" / "prompt-aset.md").read_text(encoding="utf-8")
         self.assertIn("rafa_sheet.png", ep2_aset_txt)
         self.assertIn("ruang_rapat_plate.png", ep2_aset_txt)
 
         # Test board generation
         board_out = self.tmp_path / "board_out.html"
-        self.assertEqual(bang_film_cli.main(["board", str(cloned), "--out", str(board_out)]), 0)
+        self.assertEqual(microdrama_cli.main(["board", str(cloned), "--out", str(board_out)]), 0)
         html_txt = board_out.read_text(encoding="utf-8")
         self.assertIn("Microdrama Studio", html_txt)
         self.assertIn("Salin Prompt Video", html_txt)
@@ -209,7 +209,7 @@ class TestBangFilmPrecision(unittest.TestCase):
             encoding="utf-8",
         )
         self.assertEqual(check_prompts.run_checks(cloned)["status"], "error")
-        self.assertEqual(bang_film_cli.main(["sync", str(cloned)]), 0)
+        self.assertEqual(microdrama_cli.main(["sync", str(cloned)]), 0)
         self.assertEqual(check_prompts.run_checks(cloned, strict=True)["status"], "ok")
         synced_text = pv.read_text(encoding="utf-8")
         self.assertIn("edging sideways down a narrow passage with a package under his arm.", check_prompts.rata(synced_text))

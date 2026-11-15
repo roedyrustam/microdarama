@@ -1,19 +1,18 @@
 ---
 name: microdrama
 description: "Merancang konsep dan MENULIS PROMPT presisi untuk video AI live-action — microdrama vertikal berseri, short movie, atau scene/trailer tunggal — dilengkapi verifikator semantik 25-poin, CLI sinkronisasi otomatis, Studio Produksi HTML (`board.html`), dan tool bedah video pasca-generate (`dissect_video.py`). Skill ini TIDAK menggenerate media apa pun: keluarannya berkas teks terverifikasi berisi konsep cerita, cast & set bible terkunci, shot list ber-audit risiko & sumbu 180°, prompt sheet karakter 3-panel dengan nama tercetak, prompt plate set/properti, dan prompt video sebelas blok (4–30 detik per generate) yang siap di-copy ke AI gambar dan AI video mana pun. Gunakan saat user minta 'microdrama', bikin microdrama, drama pendek vertikal, short movie, film pendek AI, scene atau trailer, prompt video AI, shot list, sheet karakter, memperbaiki klip AI yang plot hole, atau melanjutkan episode seri yang sudah ada."
-author: "Bang Tutorial · Sovereign Precision Edition"
+author: "Roedy Rustam"
 version: "2.0.0"
 license: MIT
 metadata:
-  author: Bang Tutorial
-  author_url: https://youtube.com/bangtutorial
+  author: Roedy Rustam
   version: "2.0.0"
   updated: "2026-11-16"
 ---
 
 # Microdrama v2.0 — Perancang Produksi & Penulis Prompt Video AI Presisi Tinggi
 
-**v2.0.0 (Sovereign Precision Edition) · by [Bang Tutorial](https://youtube.com/bangtutorial) · MIT.**
+**v2.0.0 (Sovereign Precision Edition) · by Roedy Rustam · MIT.**
 
 Skill ini adalah **asisten sutradara, penulis naskah, dan script supervisor otomatis — bukan generator media**. Tidak ada gambar, video, atau audio yang digenerate di sini. Keluarannya adalah berkas teks produksi terverifikasi dan studio HTML interaktif (`board.html`) agar user tinggal men-generate aset dan klip di model AI pilihannya (Kling, Seedance, Veo, Sora, Runway, Wan, GPT Image, Flux) dengan tingkat kegagalan serendah mungkin.
 
@@ -32,8 +31,8 @@ Satu tulang belakang, tiga preset:
 
 ### 0 · Tempat Kerja & Inisialisasi
 - Tanyakan folder proyek jika belum jelas. **Jangan hardcode lokasi mana pun.**
-- **Proyek baru:** jalankan `python assets/tools/bang_film_cli.py init <folder> --title "<Judul>"` (atau salin `assets/template/`).
-- **Lanjut episode:** jalankan `python assets/tools/bang_film_cli.py add-ep <folder> <N> --title "<Judul Ep>"`. Baca `konsep.md`, `cast.md`, dan `set.md` yang ada lalu **pakai apa adanya** — jangan ubah deskripsi lama.
+- **Proyek baru:** jalankan `python assets/tools/microdrama_cli.py init <folder> --title "<Judul>"` (atau salin `assets/template/`).
+- **Lanjut episode:** jalankan `python assets/tools/microdrama_cli.py add-ep <folder> <N> --title "<Judul Ep>"`. Baca `konsep.md`, `cast.md`, dan `set.md` yang ada lalu **pakai apa adanya** — jangan ubah deskripsi lama.
 
 ### 1 · BRIEF — Tanya Dulu, Jangan Menebak
 Baca `references/brief.md`.
@@ -84,7 +83,7 @@ Baca `references/prompt-aset.md`.
 ### 6 · PROMPT VIDEO
 Baca `references/prompt-video.md` dan `references/model-profiles.md` (untuk catatan pengaturan tool di luar blok).
 - **Output:** `epNN/prompt-video.md` — satu judul markdown + baris `Lampirkan:` **di luar** blok kode, dan satu blok prompt **11 bagian berurutan** (`VIDEO STYLE & FORMAT` → `LANGUAGE` → `OPTICS` → `CAMERA` → `LIGHTING` → `CRITICAL` → `CHARACTERS` → `LOCATION` → `[CONTINUITY opsional]` → `AUDIO` → `MOVEMENT NOTE` → `SHOT BREAKDOWN`).
-- Jalankan `python assets/tools/bang_film_cli.py sync <folder>` untuk memastikan salinan blok dari `cast.md`/`set.md` dan daftar `Lampirkan:` identik 100%.
+- Jalankan `python assets/tools/microdrama_cli.py sync <folder>` untuk memastikan salinan blok dari `cast.md`/`set.md` dan daftar `Lampirkan:` identik 100%.
 - **Triad Lokasi Ganda:** Jika >1 plate lokasi dalam satu scene, wajib memakai: (1) Peta Referensi di awal `LOCATION`, (2) Tag lokasi `— SISI, tempat, sudut —` di tiap baris `SHOT`, dan (3) Kunci posisi di `CONTINUITY`.
 
 ### 7 · VERIFIKASI, STUDIO PRODUKSI & PERBAIKAN PASCA-GENERATE
@@ -96,7 +95,7 @@ Baca `references/verifikasi.md`.
    Perbaiki semua masalah hingga keluar `Semua cek lolos.`.
 2. Bangun **Studio Produksi Visual HTML**:
    ```bash
-   python assets/tools/bang_film_cli.py board <folder_proyek>
+   python assets/tools/microdrama_cli.py board <folder_proyek>
    ```
    Menghasilkan `<folder_proyek>/board.html` berisi timeline shot, status cek, lencana risiko, lampiran gambar, dan tombol salin prompt bersih sekali klik.
 3. Serahkan daftar berkas, cara pakai, link `board.html`, dan catatan kelemahan jujur (jika ada).
@@ -133,12 +132,12 @@ Baca `references/verifikasi.md`.
 | `PRD.md` · `ERD.md` · `DOCUMENTATION.md` | Spesifikasi arsitektur, relasi entitas-token, dan dokumentasi bilingual lengkap |
 | `assets/template/` | Kerangka kosong 7 berkas produksi (`brief`, `konsep`, `cast`, `set`, `naskah`, `prompt-aset`, `prompt-video`) |
 | `assets/tools/check_prompts.py` | Verifikator otomatis 25-poin (Python 3 stdlib, `--json`, `--strict`) |
-| `assets/tools/bang_film_cli.py` | CLI produksi (`init`, `add-ep`, `sync`, `board`, `check`) + generator `board.html` |
+| `assets/tools/microdrama_cli.py` | CLI produksi (`init`, `add-ep`, `sync`, `board`, `check`) + generator `board.html` |
 | `assets/tools/dissect_video.py` | Tool bedah klip (`diagnose`, `analyze` ffmpeg, `branch`, `promote`) |
 | `assets/contoh/alamat-yang-sama/` | Proyek benchmark lengkap 3 episode × 30 detik (lolos 25 cek + `board.html`) |
 | `assets/contoh/unit-7/` | Proyek benchmark lengkap "Unit 7" Ep 01 (lolos 25 cek + `board.html`) |
 | `references/*.md` | 8 manual produksi per gerbang + profil deployment model (`model-profiles.md`) |
-| `tests/test_bang_film.py` | Suite pengujian unit & integrasi untuk verifier, CLI, dan dissector |
+| `tests/test_microdrama.py` | Suite pengujian unit & integrasi untuk verifier, CLI, dan dissector |
 
 ---
 

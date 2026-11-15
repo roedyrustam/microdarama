@@ -29,7 +29,7 @@ Microdrama **tidak menggenerate media sendiri**. Anda memperoleh berkas teks ter
 
 ## Peningkatan Utama v2.0
 
-Dibangun ulang dari [`bangtutorial/bang-film` (v1.3.0)](https://github.com/bangtutorial/bang-film) agar jauh lebih **presisi** dan **powerfull**:
+Dirancang dengan arsitektur **Sovereign Precision Edition v2.0** agar jauh lebih **presisi** dan **powerfull**:
 
 1. **Verifikator Semantik 25-Poin (`assets/tools/check_prompts.py`)**
    - Melampaui cek salinan blok & timecode v1.3.0 dengan mengotomatisasi **seluruh item kritis yang dulunya manual**:
@@ -42,7 +42,7 @@ Dibangun ulang dari [`bangtutorial/bang-film` (v1.3.0)](https://github.com/bangt
      - **Validasi anti-sinkronisasi figuran** di `MOVEMENT NOTE` & **audit rubrik `konsep.md`** + **audit reuse aset lintas episode**.
    - Mendukung mode `--json` dan `--strict`.
 
-2. **CLI Produksi & Studio HTML Interaktif (`assets/tools/bang_film_cli.py`)**
+2. **CLI Produksi & Studio HTML Interaktif (`assets/tools/microdrama_cli.py`)**
    - `init` & `add-ep`: Scaffolding proyek baru & episode lanjutan beserta daftar aset `Pakai ulang`.
    - `sync`: Menyinkronkan blok terkunci dari `cast.md`/`set.md` dan daftar `Lampirkan:` ke seluruh episode secara atomik — **nol drift manual**.
    - `board`: Menghasilkan **`board.html`** — Studio Produksi lokal mode gelap yang memuat Brief, Konsep, Rubrik, Cast & Set Bible, Timeline Shot visual, Lencana Risiko, Status Checker, dan tombol **Copy Clean Prompt** sekali klik.
@@ -82,19 +82,19 @@ Tanpa dependensi Python eksternal (cukup Python 3.10+):
 
 ```bash
 # 1. Buat proyek baru
-python assets/tools/bang_film_cli.py init film/proyek-baru --title "Proyek Baru"
+python assets/tools/microdrama_cli.py init film/proyek-baru --title "Proyek Baru"
 
 # 2. Tambah episode baru (otomatis mendeteksi aset reuse)
-python assets/tools/bang_film_cli.py add-ep film/proyek-baru 2 --title "Episode Dua"
+python assets/tools/microdrama_cli.py add-ep film/proyek-baru 2 --title "Episode Dua"
 
 # 3. Sinkronkan blok terkunci dari cast.md & set.md ke seluruh prompt
-python assets/tools/bang_film_cli.py sync assets/contoh/alamat-yang-sama
+python assets/tools/microdrama_cli.py sync assets/contoh/alamat-yang-sama
 
 # 4. Jalankan 25-point verifier
 python assets/tools/check_prompts.py assets/contoh/alamat-yang-sama --strict
 
 # 5. Bangun Studio Produksi Visual (board.html)
-python assets/tools/bang_film_cli.py board assets/contoh/alamat-yang-sama
+python assets/tools/microdrama_cli.py board assets/contoh/alamat-yang-sama
 
 # 6. Diagnosis gejala setelah generate video
 python assets/tools/dissect_video.py diagnose "tokoh bocor ke sisi pintu"
@@ -124,18 +124,18 @@ python -m unittest discover -s tests -v
 │   ├── template/                # 7 kerangka kosong proyek baru
 │   ├── tools/
 │   │   ├── check_prompts.py     # Verifikator otomatis 25-poin (--json, --strict)
-│   │   ├── bang_film_cli.py     # CLI init, add-ep, sync, board.html, check
+│   │   ├── microdrama_cli.py    # CLI init, add-ep, sync, board.html, check
 │   │   └── dissect_video.py     # Diagnosa 24 gejala, analisis ffmpeg, branch/promote
 │   └── contoh/
 │       ├── alamat-yang-sama/    # Proyek lengkap 3 ep × 30s (multi-plate & reuse)
 │       ├── unit-7/              # Proyek lengkap Unit 7 Ep 01
 │       └── cast.md, konsep.md, prompt-video.md, rafa_sheet.png (referensi potongan)
 └── tests/
-    └── test_bang_film.py        # Pengujian otomatis komprehensif
+    └── test_microdrama.py       # Pengujian otomatis komprehensif
 ```
 
 ---
 
 ## Lisensi
 
-[MIT](LICENSE) © 2026 [Bang Tutorial](https://youtube.com/bangtutorial) & Sovereign Precision Contributors.
+[MIT](LICENSE) © 2026 Roedy Rustam.

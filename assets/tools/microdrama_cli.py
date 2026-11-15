@@ -4,11 +4,11 @@
 Zero external dependencies (Python 3.10+ stdlib only).
 
 Usage:
-  python assets/tools/bang_film_cli.py init <folder> [--title "Judul"] [--force]
-  python assets/tools/bang_film_cli.py add-ep <folder> <ep_num> [--title "Judul Ep"]
-  python assets/tools/bang_film_cli.py sync <folder>
-  python assets/tools/bang_film_cli.py board <folder> [--out <path>]
-  python assets/tools/bang_film_cli.py check <folder> [--json] [--strict]
+  python assets/tools/microdrama_cli.py init <folder> [--title "Judul"] [--force]
+  python assets/tools/microdrama_cli.py add-ep <folder> <ep_num> [--title "Judul Ep"]
+  python assets/tools/microdrama_cli.py sync <folder>
+  python assets/tools/microdrama_cli.py board <folder> [--out <path>]
+  python assets/tools/microdrama_cli.py check <folder> [--json] [--strict]
 """
 from __future__ import annotations
 

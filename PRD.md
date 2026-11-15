@@ -3,7 +3,7 @@
 ## 1. Executive Summary
 **Microdrama** is an Agent Skill and deterministic Python 3 production toolkit for planning live-action AI video (vertical microdrama series, short films, and single scenes/trailers) and generating model-agnostic image and video prompts. Microdrama **never calls media-generation APIs**; it produces structured, cross-verified production text artifacts and an interactive local HTML production studio (`board.html`) that eliminate the core failure modes of AI video generation: identity drift, chorus-line crowd synchronization, unreadable on-screen text, spatial teleportation across cuts, trailer-montage pacing, and wasted generation credits.
 
-Upgraded from `bangtutorial/bang-film` (v1.3.0), **Microdrama v2.0** transforms manual checklist steps into automated deterministic verification (`25-point static & semantic linter`), adds a zero-dependency project scaffolder/synchronizer + visual HTML Production Board (`bang_film_cli.py`), and ships an automated `ffmpeg`/`ffprobe` cut-and-symptom repair analyzer (`dissect_video.py`).
+**Microdrama v2.0** transforms manual checklist steps into automated deterministic verification (`25-point static & semantic linter`), adds a zero-dependency project scaffolder/synchronizer + visual HTML Production Board (`microdrama_cli.py`), and ships an automated `ffmpeg`/`ffprobe` cut-and-symptom repair analyzer (`dissect_video.py`).
 
 ---
 
@@ -26,10 +26,10 @@ Upgraded from `bangtutorial/bang-film` (v1.3.0), **Microdrama v2.0** transforms 
 
 | Category | Metric / Invariant | Target Budget / Constraint | Enforcement Mechanism |
 |---|---|---|---|
-| **Runtime Dependencies** | External PyPI packages required by tooling | **0 external packages** (Python 3.10+ stdlib only) | `check_prompts.py`, `bang_film_cli.py`, `dissect_video.py` |
+| **Runtime Dependencies** | External PyPI packages required by tooling | **0 external packages** (Python 3.10+ stdlib only) | `check_prompts.py`, `microdrama_cli.py`, `dissect_video.py` |
 | **Scene Generation Bounds** | Min / Max duration per video prompt block | **4s ≤ scene ≤ 30s** | Automated regex + sum check in `check_prompts.py` |
 | **Shot Timecode Integrity** | Continuity across `SHOT 1..N` in `SHOT BREAKDOWN` | Contiguous `0..NN` with zero gaps/overlaps | Automated boundary check in `check_prompts.py` |
-| **Locked Block Fidelity** | Character/Set/Prop block drift between bible and prompts | **0.0% drift** (exact normalized substring match) | `bang_film_cli.py sync` + `check_prompts.py` |
+| **Locked Block Fidelity** | Character/Set/Prop block drift between bible and prompts | **0.0% drift** (exact normalized substring match) | `microdrama_cli.py sync` + `check_prompts.py` |
 | **Token Bijection** | `[gambar_<slug>]` vs `<slug>_sheet.png`/`<slug>_plate.png` vs `Lampirkan:` | **100% 1-to-1 bijection** | `check_prompts.py` token-attachment matcher |
 | **Speech Pacing Budget** | Spoken words per second inside a shot | **≤ 3.2 words/sec**; raw digits = **0** | Automated acoustic pacing & digit check |
 | **Camera Position Delta** | Consecutive shots from identical physical positions | **0 consecutive collisions** | `naskah.md` + `SHOT BREAKDOWN` collision detector |
@@ -50,7 +50,7 @@ python assets/tools/check_prompts.py <project_folder> [--json] [--strict]
 - `--json`: Outputs machine-readable JSON `{status, summary, errors, warnings}`.
 - `--strict`: Elevates soft warnings (e.g., speech rate > 3.2 wps, overly long sentences > 14 words) to exit code 1.
 
-### 4.2 `assets/tools/bang_film_cli.py`
+### 4.2 `assets/tools/microdrama_cli.py`
 - `init <folder> [--title "<Title>"]`: Scaffolds `brief.md`, `konsep.md`, `cast.md`, `set.md` from `assets/template/`.
 - `add-ep <folder> <ep_number> [--title "<Ep Title>"]`: Scaffolds `epNN/naskah.md`, `epNN/prompt-aset.md`, `epNN/prompt-video.md` and auto-populates `Pakai ulang dari ep ...` from prior episodes.
 - `sync <folder>`: Propagates locked long/short blocks from `cast.md` and `set.md` into `epNN/prompt-aset.md` and `epNN/prompt-video.md`, and synchronizes `Lampirkan:` filenames from `[gambar_x]` tokens.
