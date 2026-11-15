@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Microdrama v2.0 Production CLI: init, add-ep, sync, board, check.
+"""Microdrama v2.0 Production CLI: init, add-ep, sync, board, check, sync-plugin.
 
 Zero external dependencies (Python 3.10+ stdlib only).
 
@@ -9,10 +9,12 @@ Usage:
   python assets/tools/microdrama_cli.py sync <folder>
   python assets/tools/microdrama_cli.py board <folder> [--out <path>]
   python assets/tools/microdrama_cli.py check <folder> [--json] [--strict]
+  python assets/tools/microdrama_cli.py sync-plugin [--check] [--global]
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import pathlib
 import re
@@ -719,6 +721,105 @@ def cmd_check(args: argparse.Namespace) -> int:
     return verifier.main(check_args)
 
 
+def _sha256_file(path: pathlib.Path) -> str:
+    """Return the SHA-256 hex digest of a file."""
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _collect_plugin_files(base_dir: pathlib.Path, rel_target: str) -> list[pathlib.Path]:
+    """Collect relative paths under rel_target while skipping cache/system artifacts."""
+    root = base_dir / rel_target
+    if not root.exists():
+        return []
+    if root.is_file():
+        if root.name == ".DS_Store" or root.suffix == ".pyc":
+            return []
+        return [pathlib.Path(rel_target)]
+
+    collected: list[pathlib.Path] = []
+    for item in sorted(root.rglob("*")):
+        if not item.is_file():
+            continue
+        if item.name == ".DS_Store" or item.suffix == ".pyc" or "__pycache__" in item.parts:
+            continue
+        collected.append(item.relative_to(base_dir))
+    return collected
+
+
+def _sync_tree(
+    src_base: pathlib.Path,
+    dst_base: pathlib.Path,
+    targets: list[str],
+    label: str,
+    check_only: bool,
+) -> tuple[int, int]:
+    """Synchronize or verify SHA-256 parity for target entries from src_base to dst_base."""
+    synced = 0
+    drift = 0
+    for target in targets:
+        for rel in _collect_plugin_files(src_base, target):
+            src_file = src_base / rel
+            dst_file = dst_base / rel
+            src_hash = _sha256_file(src_file)
+            dst_hash = _sha256_file(dst_file) if dst_file.exists() else None
+            if src_hash != dst_hash:
+                drift += 1
+                if check_only:
+                    print(f"[DRIFT:{label}] {rel.as_posix()} differs", file=sys.stderr)
+                else:
+                    dst_file.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src_file, dst_file)
+                    synced += 1
+                    print(f"[SYNC:{label}] {rel.as_posix()}")
+    return synced, drift
+
+
+def cmd_sync_plugin(args: argparse.Namespace) -> int:
+    """Sync SKILL.md, assets, and references to skills/microdrama and optionally ~/.gemini/config/plugins/microdrama."""
+    repo_root = TOOLS_DIR.parent.parent
+    local_skill_dir = repo_root / "skills" / "microdrama"
+    skill_targets = ["SKILL.md", "assets", "references"]
+
+    synced_total = 0
+    drift_total = 0
+
+    s_local, d_local = _sync_tree(repo_root, local_skill_dir, skill_targets, "local-skill", args.check)
+    synced_total += s_local
+    drift_total += d_local
+
+    if args.global_install:
+        global_dir = pathlib.Path.home() / ".gemini" / "config" / "plugins" / "microdrama"
+        bundle_targets = [
+            "plugin.json",
+            ".claude-plugin",
+            "README.md",
+            "PRD.md",
+            "ERD.md",
+            "DOCUMENTATION.md",
+            "CHANGELOG.md",
+            "LICENSE",
+            "icon.svg",
+            "SKILL.md",
+            "rules",
+            "assets",
+            "references",
+            "skills",
+        ]
+        s_glob, d_glob = _sync_tree(repo_root, global_dir, bundle_targets, "global-plugin", args.check)
+        synced_total += s_glob
+        drift_total += d_glob
+
+    if args.check:
+        if drift_total > 0:
+            print(f"[SYNC CHECK FAILED] {drift_total} berkas belum sinkron.", file=sys.stderr)
+            return 1
+        print("[SYNC CHECK PASSED] 100% SHA-256 parity verified.")
+        return 0
+
+    print(f"[SYNC COMPLETE] {synced_total} berkas disinkronkan. 100% SHA-256 parity verified.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Microdrama v2.0 Production CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -746,6 +847,10 @@ def main(argv: list[str] | None = None) -> int:
     p_chk.add_argument("--json", action="store_true")
     p_chk.add_argument("--strict", action="store_true")
 
+    p_sp = sub.add_parser("sync-plugin", help="Sinkronkan paket plugin ke skills/microdrama dan instalasi global")
+    p_sp.add_argument("--check", action="store_true", help="Periksa paritas SHA-256 tanpa menulis berkas")
+    p_sp.add_argument("--global", dest="global_install", action="store_true", help="Sinkronkan juga ke ~/.gemini/config/plugins/microdrama")
+
     args = parser.parse_args(argv)
     dispatch = {
         "init": cmd_init,
@@ -753,6 +858,7 @@ def main(argv: list[str] | None = None) -> int:
         "sync": cmd_sync,
         "board": cmd_board,
         "check": cmd_check,
+        "sync-plugin": cmd_sync_plugin,
     }
     return dispatch[args.command](args)
 

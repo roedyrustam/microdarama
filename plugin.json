@@ -1,0 +1,15 @@
+{
+  "name": "microdrama",
+  "displayName": "Microdrama",
+  "version": "2.0.0",
+  "description": "Precision AI live-action video architecture & prompt engineering system — vertical microdrama series, short films, single scenes or trailers with 7 gated workflows, 25-point semantic verifier, HTML Production Studio (board.html), and post-gen clip dissection.",
+  "author": {
+    "name": "Roedy Rustam"
+  },
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "Buat microdrama vertikal baru dari awal melalui 7 gerbang produksi",
+    "Verifikasi seluruh berkas proyek microdrama dengan check_prompts.py --strict",
+    "Bangun Studio Produksi Visual interaktif (board.html) atau bedah klip video yang plot hole"
+  ]
+}

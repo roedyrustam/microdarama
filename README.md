@@ -101,6 +101,9 @@ python assets/tools/dissect_video.py diagnose "tokoh bocor ke sisi pintu"
 
 # 7. Jalankan seluruh suite pengujian
 python -m unittest discover -s tests -v
+
+# 8. Sinkronkan paket plugin Antigravity/Claude ke instalasi global
+python assets/tools/microdrama_cli.py sync-plugin --global
 ```
 
 ---
@@ -108,9 +111,14 @@ python -m unittest discover -s tests -v
 ## Tata Letak Berkas
 
 ```text
-├── SKILL.md                     # Instruksi master 7 gerbang untuk AI Agent
+├── plugin.json                    # Manifes plugin Antigravity (v2.0.0)
+├── SKILL.md                       # Instruksi master 7 gerbang untuk AI Agent
 ├── PRD.md · ERD.md · DOCUMENTATION.md
-├── .claude-plugin/              # Manifes plugin & marketplace (v2.0.0)
+├── .claude-plugin/                # Manifes plugin & marketplace Claude (v2.0.0)
+├── rules/
+│   └── AGENTS.md                  # Aturan aktivasi otomatis plugin Microdrama
+├── skills/
+│   └── microdrama/                # Cerminan skill tersinkronisasi SHA-256
 ├── references/
 │   ├── brief.md                 # Gerbang 1: 2 kartu tanya, aturan zero-default
 │   ├── konsep.md                # Gerbang 2 & 4: format, sumbu 180°, shot berisiko, split 4-30s

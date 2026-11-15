@@ -1,3 +1,4 @@
+import json
 import pathlib
 import shutil
 import sys
@@ -225,6 +226,17 @@ class TestMicrodramaPrecision(unittest.TestCase):
         self.assertIn("Branch v2", v2.read_text(encoding="utf-8"))
         self.assertEqual(dissect_video.main(["promote", str(v2)]), 0)
         self.assertNotIn("Branch v2", pv.read_text(encoding="utf-8"))
+
+    def test_plugin_manifest_and_sync_parity(self) -> None:
+        root_manifest = json.loads((ROOT_DIR / "plugin.json").read_text(encoding="utf-8"))
+        claude_manifest = json.loads((ROOT_DIR / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        self.assertEqual(root_manifest["name"], "microdrama")
+        self.assertEqual(root_manifest["author"]["name"], "Roedy Rustam")
+        self.assertEqual(claude_manifest["name"], "microdrama")
+        self.assertEqual(claude_manifest["author"]["name"], "Roedy Rustam")
+        self.assertTrue((ROOT_DIR / "rules" / "AGENTS.md").exists())
+        self.assertTrue((ROOT_DIR / "assets" / "logo.svg").exists())
+        self.assertEqual(microdrama_cli.main(["sync-plugin", "--check"]), 0)
 
 
 if __name__ == "__main__":
