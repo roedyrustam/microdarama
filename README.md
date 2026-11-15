@@ -111,9 +111,13 @@ python assets/tools/dissect_video.py diagnose "tokoh bocor ke sisi pintu"
 # 8. Jalankan seluruh suite pengujian
 python -m unittest discover -s tests -v
 
-# 9. Sinkronkan paket plugin Antigravity/Claude ke instalasi global
+# 9. Sinkronkan ke Gemini (Antigravity / Gemini CLI) & ChatGPT / OpenAI Codex global
 python assets/tools/microdrama_cli.py sync-plugin --global
 ```
+
+Instalasi global (`sync-plugin --global`) otomatis menempatkan dan memverifikasi SHA-256 untuk:
+- **Gemini / Antigravity**: `~/.gemini/config/plugins/microdrama`, `~/.gemini/skills/microdrama`, dan `~/.gemini/extensions/microdrama`
+- **ChatGPT / OpenAI Codex**: `~/.codex/skills/microdrama`, `~/.codex/plugins/microdrama`, `~/.codex/rules/microdrama.md`, `~/.codex/CODEX.md`, dan registry universal `~/.agents/skills/microdrama`
 
 ---
 
@@ -121,9 +125,14 @@ python assets/tools/microdrama_cli.py sync-plugin --global
 
 ```text
 ├── plugin.json                    # Manifes plugin Antigravity (v2.1.0)
+├── gemini-extension.json          # Manifes Gemini CLI extension (v2.1.0)
 ├── SKILL.md                       # Instruksi master 7 gerbang untuk AI Agent
+├── CODEX.md                       # Pintu masuk OpenAI Codex / ChatGPT agent
 ├── PRD.md · ERD.md · DOCUMENTATION.md
 ├── .claude-plugin/                # Manifes plugin & marketplace Claude (v2.1.0)
+├── .codex-plugin/                 # Manifes plugin ChatGPT / OpenAI Codex (v2.1.0)
+├── .codex/
+│   └── rules/microdrama.md        # Aturan aktivasi Codex / ChatGPT
 ├── agents/
 │   └── microdrama-director.md     # Subagen spesialis 7 Gerbang & 14 Aturan Keras
 ├── rules/

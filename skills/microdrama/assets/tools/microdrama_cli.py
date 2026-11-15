@@ -16,6 +16,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import html
 import json
@@ -1307,8 +1308,47 @@ def _sync_tree(
     return synced, drift
 
 
+def _sync_agents_skill_lock(repo_root: pathlib.Path, agents_dir: pathlib.Path, check_only: bool) -> tuple[int, int]:
+    """Register or verify microdrama inside ~/.agents/.skill-lock.json without overwriting sibling skills."""
+    lock_path = agents_dir / ".skill-lock.json"
+    if not lock_path.exists():
+        if check_only:
+            return 0, 0
+        lock_data: dict[str, Any] = {"version": 3, "skills": {}}
+    else:
+        try:
+            lock_data = json.loads(lock_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            lock_data = {"version": 3, "skills": {}}
+
+    skills_map = lock_data.setdefault("skills", {})
+    skill_hash = _sha256_file(repo_root / "SKILL.md")
+    existing = skills_map.get("microdrama", {})
+    if isinstance(existing, dict) and existing.get("skillFolderHash") == skill_hash:
+        return 0, 0
+
+    if check_only:
+        print("[DRIFT:agents-lock] microdrama entry missing or stale in .skill-lock.json", file=sys.stderr)
+        return 0, 1
+
+    now_iso = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    skills_map["microdrama"] = {
+        "source": "roedyrustam/microdarama",
+        "sourceType": "github",
+        "sourceUrl": "https://github.com/roedyrustam/microdarama.git",
+        "skillPath": "skills/microdrama/SKILL.md",
+        "skillFolderHash": skill_hash,
+        "installedAt": existing.get("installedAt", now_iso) if isinstance(existing, dict) else now_iso,
+        "updatedAt": now_iso,
+    }
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path.write_text(json.dumps(lock_data, indent=2) + "\n", encoding="utf-8")
+    print("[SYNC:agents-lock] registered microdrama in ~/.agents/.skill-lock.json")
+    return 1, 0
+
+
 def cmd_sync_plugin(args: argparse.Namespace) -> int:
-    """Sync SKILL.md, assets, and references to skills/microdrama and optionally ~/.gemini/config/plugins/microdrama."""
+    """Sync SKILL.md, assets, references, and platform bundles across Gemini & ChatGPT/Codex."""
     repo_root = TOOLS_DIR.parent.parent
     local_skill_dir = repo_root / "skills" / "microdrama"
     skill_targets = ["SKILL.md", "assets", "references"]
@@ -1321,10 +1361,14 @@ def cmd_sync_plugin(args: argparse.Namespace) -> int:
     drift_total += d_local
 
     if args.global_install:
-        global_dir = pathlib.Path.home() / ".gemini" / "config" / "plugins" / "microdrama"
+        home = pathlib.Path.home()
         bundle_targets = [
             "plugin.json",
+            "gemini-extension.json",
             ".claude-plugin",
+            ".codex-plugin",
+            ".codex",
+            "CODEX.md",
             "README.md",
             "PRD.md",
             "ERD.md",
@@ -1339,9 +1383,37 @@ def cmd_sync_plugin(args: argparse.Namespace) -> int:
             "references",
             "skills",
         ]
-        s_glob, d_glob = _sync_tree(repo_root, global_dir, bundle_targets, "global-plugin", args.check)
-        synced_total += s_glob
-        drift_total += d_glob
+        # 1. Gemini / Antigravity global plugin & Gemini CLI skill/extension
+        gemini_dir = home / ".gemini"
+        for target_dir, targets, label in [
+            (gemini_dir / "config" / "plugins" / "microdrama", bundle_targets, "gemini-plugin"),
+            (gemini_dir / "skills" / "microdrama", skill_targets, "gemini-skill"),
+            (gemini_dir / "extensions" / "microdrama", bundle_targets, "gemini-extension"),
+        ]:
+            s_cnt, d_cnt = _sync_tree(repo_root, target_dir, targets, label, args.check)
+            synced_total += s_cnt
+            drift_total += d_cnt
+
+        # 2. ChatGPT / OpenAI Codex global skill, rules & plugin
+        codex_dir = home / ".codex"
+        for src_base, dst_dir, targets, label in [
+            (repo_root, codex_dir / "skills" / "microdrama", skill_targets, "codex-skill"),
+            (repo_root, codex_dir / "plugins" / "microdrama", bundle_targets, "codex-plugin"),
+            (repo_root, codex_dir, ["CODEX.md"], "codex-entry"),
+            (repo_root / ".codex", codex_dir, ["rules"], "codex-rules"),
+        ]:
+            s_cnt, d_cnt = _sync_tree(src_base, dst_dir, targets, label, args.check)
+            synced_total += s_cnt
+            drift_total += d_cnt
+
+        # 3. Universal Agent Skills (~/.agents/skills/microdrama)
+        agents_dir = home / ".agents"
+        s_ag, d_ag = _sync_tree(repo_root, agents_dir / "skills" / "microdrama", skill_targets, "agents-skill", args.check)
+        synced_total += s_ag
+        drift_total += d_ag
+        s_lk, d_lk = _sync_agents_skill_lock(repo_root, agents_dir, args.check)
+        synced_total += s_lk
+        drift_total += d_lk
 
     if args.check:
         if drift_total > 0:

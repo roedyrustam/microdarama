@@ -275,14 +275,16 @@ class TestMicrodramaPrecision(unittest.TestCase):
     def test_plugin_manifest_and_sync_parity(self) -> None:
         root_manifest = json.loads((ROOT_DIR / "plugin.json").read_text(encoding="utf-8"))
         claude_manifest = json.loads((ROOT_DIR / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
-        self.assertEqual(root_manifest["name"], "microdrama")
-        self.assertEqual(root_manifest["version"], "2.1.0")
-        self.assertEqual(root_manifest["author"]["name"], "Roedy Rustam")
-        self.assertEqual(claude_manifest["name"], "microdrama")
-        self.assertEqual(claude_manifest["version"], "2.1.0")
-        self.assertEqual(claude_manifest["author"]["name"], "Roedy Rustam")
+        gemini_manifest = json.loads((ROOT_DIR / "gemini-extension.json").read_text(encoding="utf-8"))
+        codex_manifest = json.loads((ROOT_DIR / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        for manifest in (root_manifest, claude_manifest, gemini_manifest, codex_manifest):
+            self.assertEqual(manifest["name"], "microdrama")
+            self.assertEqual(manifest["version"], "2.1.0")
+            self.assertEqual(manifest["author"]["name"], "Roedy Rustam")
         self.assertTrue((ROOT_DIR / "agents" / "microdrama-director.md").exists())
         self.assertTrue((ROOT_DIR / "rules" / "AGENTS.md").exists())
+        self.assertTrue((ROOT_DIR / "CODEX.md").exists())
+        self.assertTrue((ROOT_DIR / ".codex" / "rules" / "microdrama.md").exists())
         self.assertTrue((ROOT_DIR / "assets" / "logo.svg").exists())
         self.assertEqual(microdrama_cli.main(["sync-plugin", "--check"]), 0)
 

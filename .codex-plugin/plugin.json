@@ -1,0 +1,49 @@
+{
+  "name": "microdrama",
+  "displayName": "Microdrama",
+  "version": "2.1.0",
+  "description": "Precision AI live-action video architecture & prompt engineering system — vertical microdrama series, short films, single scenes or trailers with 7 gated workflows, 25-point semantic verifier, JSON export packager, HTML Studio v2.1, and post-gen clip dissection.",
+  "homepage": "https://github.com/roedyrustam/microdarama",
+  "repository": "https://github.com/roedyrustam/microdarama.git",
+  "license": "MIT",
+  "logo": "assets/logo.svg",
+  "icon": "assets/logo.svg",
+  "author": {
+    "name": "Roedy Rustam",
+    "url": "https://github.com/roedyrustam"
+  },
+  "keywords": [
+    "ai-video",
+    "microdrama",
+    "short-film",
+    "prompt-writing",
+    "shot-list",
+    "character-sheet",
+    "screenwriting",
+    "video-prompt",
+    "continuity-verifier",
+    "production-board"
+  ],
+  "platforms": {
+    "antigravity": {
+      "entry": "rules/AGENTS.md",
+      "config": "plugin.json",
+      "skillsDir": "skills/"
+    },
+    "gemini": {
+      "entry": "SKILL.md",
+      "config": "gemini-extension.json",
+      "skillsDir": "skills/"
+    },
+    "codex": {
+      "entry": "CODEX.md",
+      "rulesDir": ".codex/rules/",
+      "skillsDir": "skills/"
+    },
+    "claude": {
+      "entry": "SKILL.md",
+      "config": ".claude-plugin/plugin.json",
+      "skillsDir": "skills/"
+    }
+  }
+}
