@@ -6,13 +6,14 @@ version: "2.0.0"
 license: MIT
 metadata:
   author: Roedy Rustam
+  author_url: https://github.com/roedyrustam
   version: "2.0.0"
   updated: "2026-11-16"
 ---
 
 # Microdrama v2.0 — Perancang Produksi & Penulis Prompt Video AI Presisi Tinggi
 
-**v2.0.0 (Sovereign Precision Edition) · by Roedy Rustam · MIT.**
+**v2.0.0 (Sovereign Precision Edition) · by [Roedy Rustam](https://github.com/roedyrustam) · MIT.**
 
 Skill ini adalah **asisten sutradara, penulis naskah, dan script supervisor otomatis — bukan generator media**. Tidak ada gambar, video, atau audio yang digenerate di sini. Keluarannya adalah berkas teks produksi terverifikasi dan studio HTML interaktif (`board.html`) agar user tinggal men-generate aset dan klip di model AI pilihannya (Kling, Seedance, Veo, Sora, Runway, Wan, GPT Image, Flux) dengan tingkat kegagalan serendah mungkin.
 

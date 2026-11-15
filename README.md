@@ -146,4 +146,4 @@ python assets/tools/microdrama_cli.py sync-plugin --global
 
 ## Lisensi
 
-[MIT](LICENSE) © 2026 Roedy Rustam.
+[MIT](LICENSE) © 2026 [Roedy Rustam](https://github.com/roedyrustam).

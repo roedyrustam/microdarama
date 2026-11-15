@@ -4,8 +4,11 @@
   "version": "2.0.0",
   "description": "Precision AI live-action video architecture & prompt engineering system — vertical microdrama series, short films, single scenes or trailers with 7 gated workflows, 25-point semantic verifier, HTML Production Studio (board.html), and post-gen clip dissection.",
   "author": {
-    "name": "Roedy Rustam"
+    "name": "Roedy Rustam",
+    "url": "https://github.com/roedyrustam"
   },
+  "homepage": "https://github.com/roedyrustam/microdrama",
+  "repository": "https://github.com/roedyrustam/microdrama",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
     "Buat microdrama vertikal baru dari awal melalui 7 gerbang produksi",

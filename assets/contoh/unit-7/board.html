@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microdrama Studio — Unit 7</title>
+<style>
+  :root {
+    --bg: #0c0f14; --surface: #141922; --surface-2: #1b222e; --border: #262e3d;
+    --text: #eef2f7; --muted: #93a0b4; --accent: #f59e0b; --ok: #10b981; --err: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px 64px; }
+  .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 24px; }
+  h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: 17px; margin: 0 0 12px; font-weight: 600; }
+  h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 24px 0 10px; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .badge-ok { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.35); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .badge-err { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.35); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .grid-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .meta-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .meta-k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .meta-v { font-size: 14px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 20px; }
+  .bible-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .bible-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+  .bible-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: var(--accent); }
+  .file-pill { display: inline-block; font-family: ui-monospace, monospace; font-size: 11px; background: #0d121a; border: 1px solid var(--border); color: #cbd5e1; padding: 2px 7px; border-radius: 4px; margin: 2px 4px 2px 0; }
+  .mono-sm { font-family: ui-monospace, monospace; font-size: 11.5px; color: #cbd5e1; white-space: pre-wrap; margin: 8px 0 0; line-height: 1.45; }
+  .tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
+  .tab-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .tab-btn.active { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+  .ep-panel { display: none; }
+  .ep-panel.active { display: block; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface); }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); background: var(--surface-2); }
+  td.num { font-variant-numeric: tabular-nums; font-family: ui-monospace, monospace; white-space: nowrap; }
+  .risk-pill { background: rgba(245,158,11,0.14); color: #fbbf24; border: 1px solid rgba(245,158,11,0.35); padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .ok-pill { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.28); padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .prompt-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+  .prompt-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .att-row { margin-top: 4px; font-size: 12px; color: var(--muted); }
+  .copy-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 7px 13px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+  .copy-btn:hover { border-color: var(--accent); }
+  .copy-primary { background: #f59e0b; color: #0c0f14; border-color: #f59e0b; }
+  .tl-bar { display: flex; gap: 3px; margin-bottom: 10px; height: 28px; }
+  .tl-seg { background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 7px; font-size: 11px; font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; overflow: hidden; }
+  .tl-seg.seg-risk { border-color: rgba(245,158,11,0.65); background: rgba(245,158,11,0.08); }
+  .tl-sec { color: var(--muted); }
+  .prompt-pre { background: #0a0d12; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: #dbe3ee; white-space: pre-wrap; max-height: 360px; overflow-y: auto; margin: 0; }
+  .reuse-note { font-size: 13px; color: var(--accent); margin: 4px 0 12px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .issue-list { margin: 0; padding-left: 18px; font-size: 13px; }
+  .err-item { color: #f87171; margin-bottom: 4px; }
+  .warn-item { color: #fbbf24; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div>
+      <h1>Microdrama Studio · Unit 7</h1>
+      <div class="sub">teknisi AC yang dipermalukan manajer kantor di ruang rapat, padahal kantor itu baru</div>
+    </div>
+    <div class="badge-ok">25-Point Verifier: LOLOS (1 Ep · 2 Cast · 1 Set/Prop)</div>
+  </header>
+
+  <section class="grid-meta">
+    <div class="meta-box"><div class="meta-k">Format</div><div class="meta-v">Microdrama seri</div></div>
+    <div class="meta-box"><div class="meta-k">Rasio (UI AI Video)</div><div class="meta-v">9:16</div></div>
+    <div class="meta-box"><div class="meta-k">Durasi Target</div><div class="meta-v">30 detik per episode</div></div>
+    <div class="meta-box"><div class="meta-k">Bahasa Dialog</div><div class="meta-v">Indonesia</div></div>
+    <div class="meta-box"><div class="meta-k">Look</div><div class="meta-v">Jakarta modern, kantor kelas atas</div></div>
+  </section>
+
+  
+
+  <section class="card">
+    <h2>Konsep & Rubrik</h2>
+    <p><strong>Logline:</strong> Seorang teknisi AC dipermalukan di depan dua belas karyawan saat memperbaiki unit di ruang rapat — tiga hari sebelum perusahaan itu resmi berpindah ke namanya.</p>
+    <p><strong>Hook Dipilih:</strong> **nomor 1 — suara dulu.**</p>
+    <p><strong>Rubrik:</strong> <code>Hook 5 · Spesifik 5 · Detail meleset 5 · Dialog 4 · Diam 5 · Tanam &amp; bayar 4 · Akhir 5 —</code></p>
+  </section>
+
+  <section class="card">
+    <h2>Cast & Set Bible Terkunci</h2>
+    <div class="bible-grid"><div class='bible-card'><div class='bible-head'><strong>RAFA</strong><code>[gambar_rafa]</code></div><div class='file-pill'>rafa_sheet.png</div><pre class='mono-sm'>Indonesian man, 28 years old, 172 cm, warm brown skin, short cropped black hair, strong
+jaw, lean muscular build.
+WARDROBE: dark navy blue long-sleeve technician uniform shirt with the sleeves rolled to
+the forearm, the name RAFA embroidered in small white letters on the right chest, matching
+dark navy work trousers, black work boots, grey cloth gloves tucked into the trouser pocket.</pre></div><div class='bible-card'><div class='bible-head'><strong>BU DIAN</strong><code>[gambar_bu_dian]</code></div><div class='file-pill'>bu_dian_sheet.png</div><pre class='mono-sm'>Indonesian woman, 45 years old, 160 cm, light skin, black hair pulled into a tight low bun
+with no loose strands, oval face, thin metal-framed glasses, slim build.
+WARDROBE: cream single-breasted blazer over a white blouse, a small gold pin on the left
+lapel, knee-length cream skirt, low black heels.</pre></div><div class='bible-card'><div class='bible-head'><strong>RUANG RAPAT</strong><code>[gambar_ruang_rapat]</code></div><div class='file-pill'>ruang_rapat_plate.png</div><pre class='mono-sm'>High-floor Jakarta office meeting room. One full-height glass wall onto layered towers.
+Long wood table, twelve black mesh chairs. Grey marble floor. Double frosted-glass entry
+doors at the corridor end. One ceiling cassette air-conditioner with its access panel
+hanging open.</pre></div></div>
+  </section>
+
+  <nav class="tabs"><button class='tab-btn active' onclick="showTab('ep01', this)">EP01</button></nav>
+  <div id='tab-ep01' class='ep-panel active'><h2>Ep 01 · Ruang Rapat</h2><h3>Shot List & Audit Risiko</h3><div class='table-wrap'><table><thead><tr><th>Shot</th><th>Durasi</th><th>Set</th><th>Ukuran</th><th>Posisi Kamera</th><th>Dialog</th><th>Status</th></tr></thead><tbody><tr><td class='num'>s01</td><td class='num'>4s</td><td>Ruang rapat</td><td>ECU</td><td>rendah, di samping baki tangga</td><td>Bu Dian (off-screen)</td><td><span class='risk-pill' title='close-up tanpa wajah di dekat momen dialog off-screen (dipertahankan — hook utama episode)'>RISIKO</span></td></tr><tr><td class='num'>s02</td><td class='num'>6s</td><td>Ruang rapat</td><td>WIDE</td><td>ujung jauh meja rapat</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s03</td><td class='num'>6s</td><td>Ruang rapat</td><td>MEDIUM</td><td>dari balik bahu karyawan</td><td>Bu Dian</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s04</td><td class='num'>4s</td><td>Ruang rapat</td><td>CU</td><td>rendah, di samping tangga</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s05</td><td class='num'>6s</td><td>Ruang rapat</td><td>CU</td><td>sudut berlawanan menghadap Rafa</td><td>Rafa</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s06</td><td class='num'>4s</td><td>Ruang rapat</td><td>CU</td><td>dekat dinding kaca menghadap Bu Dian</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr></tbody></table></div><h3>Prompt Aset (Gerbang 5)</h3><div class='prompt-box'><div class='prompt-top'><div><strong>Sheet karakter · RAFA</strong> · <span class='file-pill'>rafa_sheet.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep01-gambar_rafa', this)">Salin Prompt Aset</button></div><pre id='aset-ep01-gambar_rafa' class='prompt-pre'>Character reference sheet for film production. Three panels side by side, separated by
+thin subtle vertical gaps. One continuous neutral dark grey seamless studio backdrop
+across all three panels. Soft even studio lighting, photorealistic cinematic photography,
+35mm film look, fine grain, muted desaturated colour.
+
+LEFT PANEL: tight close-up portrait, head and shoulders only, neutral expression, mouth
+closed, eyes looking straight into the lens, sharp focus on the eyes.
+
+MIDDLE PANEL: the SAME person, full body head to feet, standing straight facing the
+camera, head and face fully visible, arms relaxed at the sides, feet together, neutral
+expression.
+
+RIGHT PANEL: the SAME person, full body head to feet, standing straight seen from
+directly behind, head fully visible, arms relaxed at the sides, showing the back of the
+clothing.
+
+THE PERSON: Indonesian man, 28 years old, 172 cm, warm brown skin, short cropped black hair, strong
+jaw, lean muscular build.
+
+WARDROBE: dark navy blue long-sleeve technician uniform shirt with the sleeves rolled to
+the forearm, the name RAFA embroidered in small white letters on the right chest, matching
+dark navy work trousers, black work boots, grey cloth gloves tucked into the trouser pocket.
+
+A clean white sans-serif label reading RAFA printed in the lower left corner of the left
+panel.
+
+The same person, the same face, the same clothing in all three panels. Photorealistic,
+not illustration.
+
+Avoid: more than one person per panel, different faces between panels, missing head,
+patterned or gradient background, hard shadows, dramatic camera angles, extra text,
+watermark, logo.</pre></div><div class='prompt-box'><div class='prompt-top'><div><strong>Sheet karakter · BU DIAN</strong> · <span class='file-pill'>bu_dian_sheet.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep01-gambar_bu_dian', this)">Salin Prompt Aset</button></div><pre id='aset-ep01-gambar_bu_dian' class='prompt-pre'>Character reference sheet for film production. Three panels side by side, separated by
+thin subtle vertical gaps. One continuous neutral dark grey seamless studio backdrop
+across all three panels. Soft even studio lighting, photorealistic cinematic photography,
+35mm film look, fine grain, muted desaturated colour.
+
+LEFT PANEL: tight close-up portrait, head and shoulders only, neutral expression, mouth
+closed, eyes looking straight into the lens, sharp focus on the eyes.
+
+MIDDLE PANEL: the SAME person, full body head to feet, standing straight facing the
+camera, head and face fully visible, arms relaxed at the sides, feet together, neutral
+expression.
+
+RIGHT PANEL: the SAME person, full body head to feet, standing seen from directly behind,
+head fully visible, arms relaxed at the sides, showing the back of the clothing.
+
+THE PERSON: Indonesian woman, 45 years old, 160 cm, light skin, black hair pulled into a tight low bun
+with no loose strands, oval face, thin metal-framed glasses, slim build.
+
+WARDROBE: cream single-breasted blazer over a white blouse, a small gold pin on the left
+lapel, knee-length cream skirt, low black heels.
+
+A clean white sans-serif label reading BU DIAN printed in the lower left corner of the left
+panel.
+
+The same person, the same face, the same clothing in all three panels. Photorealistic,
+not illustration.
+
+Avoid: more than one person per panel, different faces between panels, missing head,
+patterned or gradient background, hard shadows, dramatic camera angles, extra text,
+watermark, logo.</pre></div><div class='prompt-box'><div class='prompt-top'><div><strong>Set plate · Ruang rapat</strong> · <span class='file-pill'>ruang_rapat_plate.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep01-gambar_ruang_rapat', this)">Salin Prompt Aset</button></div><pre id='aset-ep01-gambar_ruang_rapat' class='prompt-pre'>Photorealistic interior photograph, absolutely no people in frame.
+
+High-floor Jakarta office meeting room. One full-height glass wall onto layered towers.
+Long wood table, twelve black mesh chairs. Grey marble floor. Double frosted-glass entry
+doors at the corridor end. One ceiling cassette air-conditioner with its access panel
+hanging open.
+
+Midday, hard daylight entering from the left. 24mm lens, eye height, level horizon,
+straight-on composition.
+
+Avoid: people, text, signage, extra furniture, coloured practical lights, lens flare,
+watermark.</pre></div><h3>Prompt Video (Gerbang 6)</h3><div class='prompt-box'><div class='prompt-top'><div><strong>Scene 1 · Ruang rapat · 30 detik</strong><div class='att-row'>Lampirkan: <span class='file-pill'>rafa_sheet.png</span><span class='file-pill'>bu_dian_sheet.png</span><span class='file-pill'>ruang_rapat_plate.png</span></div></div><button class='copy-btn copy-primary' onclick="copyPrompt('vid-ep01-0', this)">Salin Prompt Video</button></div><div class='tl-bar'><div class='tl-seg seg-risk' style='width:13.33%' title='SHOT 1 (0-4s) , 85mm EXTREME CLOSE-UP from beside the step-ladder tray, static, low | RISIKO: close-up tanpa wajah di dekat momen dialog off-screen (dipertahankan — hook utama episode)'><span class='tl-id'>S1</span><span class='tl-sec'>4s</span></div><div class='tl-seg' style='width:20.00%' title='SHOT 2 (4-10s) , 35mm WIDE from the far end of the table, very slow push in'><span class='tl-id'>S2</span><span class='tl-sec'>6s</span></div><div class='tl-seg' style='width:20.00%' title='SHOT 3 (10-16s) , 35mm MEDIUM from behind the seated staff at shoulder height, pushing'><span class='tl-id'>S3</span><span class='tl-sec'>6s</span></div><div class='tl-seg' style='width:13.33%' title='SHOT 4 (16-20s) , 85mm CLOSE-UP from low beside the step-ladder facing RAFA, static'><span class='tl-id'>S4</span><span class='tl-sec'>4s</span></div><div class='tl-seg' style='width:20.00%' title='SHOT 5 (20-26s) , 85mm CLOSE-UP from the opposite corner of the table facing RAFA, static'><span class='tl-id'>S5</span><span class='tl-sec'>6s</span></div><div class='tl-seg' style='width:13.33%' title='SHOT 6 (26-30s) , 85mm CLOSE-UP from beside the glass wall facing BU DIAN, extremely slow'><span class='tl-id'>S6</span><span class='tl-sec'>4s</span></div></div><pre id='vid-ep01-0' class='prompt-pre'>VIDEO STYLE &amp; FORMAT
+30-second scene in the style of a modern Indonesian short drama. ONE continuous
+confrontation — a single unbroken moment in one room, NOT a trailer, NOT a montage —
+covered like a real film: cut between MULTIPLE camera positions, angles changing every
+few seconds while the moment flows continuously. Slow, heavy pacing with real silence
+between lines. Naturalistic, underplayed acting. Look: cold filmic colour grading,
+crushed blacks, fine film grain, shallow depth of field, accurate Indonesian skin tones.
+NOT sinetron, NO dramatic zooms, NO rapid cutting, dialogue never rushed.
+
+LANGUAGE
+All spoken dialogue in INDONESIAN (Bahasa Indonesia), Jakarta register, casual spoken
+form — not formal news-reader Indonesian. Speak the lines exactly as written in the
+breakdown below: do not translate them, do not paraphrase them, do not invent extra
+lines. Numbers are spoken as Indonesian words. No English words. No subtitles, no
+captions, no on-screen text of any kind burned into the frame. Character names are never
+spoken aloud unless they appear inside the quotation marks.
+
+OPTICS
+Base 35mm spherical at T2.0 — natural perspective, mild compression, SHALLOW depth of
+field so the twelve seated staff fall soft behind the two leads. Close-ups step up to
+85mm (FOV approx 24 degrees) for face isolation and background separation. Per-shot lens
+is specified in the breakdown. No wide-angle distortion, no fisheye, no zoom moves.
+
+CAMERA
+Every cut moves to a DIFFERENT physical position — beside the step-ladder tray, far end of
+the table, behind the seated staff at shoulder height, low beside the step-ladder, opposite
+side facing Rafa, and near the glass wall facing Bu Dian. Never two consecutive shots from
+the same position. Movement is limited to very slow pushes on a dolly; no handheld shake,
+no orbit, no crane. No slow-motion.
+
+LIGHTING
+Single hard key: midday sun through the full-height glass wall camera-left, undiffused —
+a hot white edge down the left side of every face. The ceiling fluorescent panels are OFF
+because the air-conditioner is being serviced, so the right side of each face falls into
+true negative fill, deep and uncorrected. Cool daylight field at 5600K; the only warm
+note is one amber desk lamp at the far end of the table. Low-key, high contrast, never
+flat front light. The grey marble floor bounces a thin cold sheen up onto chins.
+
+CRITICAL
+TWO speaking characters plus twelve silent background staff. Every character keeps the
+exact face, hairstyle and clothing from their reference images in every shot. No face
+swapping, no morphing, no duplicated faces, no extra people appearing or vanishing
+between cuts. Accurate Indonesian lip-sync — only the speaking character&#x27;s mouth moves;
+everyone else stays still and listens.
+
+CHARACTERS (from reference images)
+RAFA [gambar_rafa] — 28, dark navy technician uniform, sleeves rolled to the forearm, name
+patch on the right chest, up a step-ladder holding a wrench.
+BU DIAN [gambar_bu_dian] — 45, cream blazer over a white blouse, hair in a tight bun, thin
+metal-framed glasses, standing with her arms folded.
+BACKGROUND — twelve office staff in muted office wear, seated, silent, none featured.
+
+LOCATION (from references)
+The meeting room [gambar_ruang_rapat] — High-floor Jakarta office meeting room. One
+full-height glass wall onto layered towers. Long wood table, twelve black mesh chairs.
+Grey marble floor. Double frosted-glass entry doors at the corridor end. One ceiling
+cassette air-conditioner with its access panel hanging open.
+
+AUDIO
+Room tone of a sealed high-floor office with the air-conditioning OFF — no hum, noticeably
+dead. Faint traffic far below the glass. A wrench set down on aluminium. Chair fabric
+shifting. NO musical score at all until the final two seconds, then one low sustained
+cello note. Dialogue in natural Indonesian at an unhurried pace, with real silence
+between lines.
+
+MOVEMENT NOTE
+Bu Dian and Rafa run on OPPOSITE rhythms. Bu Dian is fast and clipped, chin high, and
+plays to the room — she turns toward the staff when she speaks. Rafa is slow and
+economical; he never raises his voice, never gestures, and never looks at her for more
+than two seconds. The twelve staff NEVER react as a block — one looks down, one looks
+away, one keeps watching; never a synchronised crowd turn.
+
+SHOT BREAKDOWN
+
+SCENE [00:00-00:30] RUANG RAPAT — one continuous confrontation, cut between positions:
+
+SHOT 1 (0-4s), 85mm EXTREME CLOSE-UP from beside the step-ladder tray, static, low: a man&#x27;s
+hand lets a wrench down onto the aluminium tray of a step-ladder. Off-screen, a woman&#x27;s
+voice — cold, unhurried.
+
+BU DIAN (off-screen): &quot;Orang kayak kamu nggak akan pernah duduk di kursi ini.&quot;
+
+SHOT 2 (4-10s), 35mm WIDE from the far end of the table, very slow push in: twelve staff
+seated along the table, not one of them looking up. Beyond them BU DIAN stands with her
+arms folded; behind her, high on a step-ladder, RAFA with the open air-conditioner panel
+above his head. No dialogue — six seconds of dead room tone.
+
+SHOT 3 (10-16s), 35mm MEDIUM from behind the seated staff at shoulder height, pushing
+slowly toward BU DIAN: she turns a quarter away from him to address the room instead.
+
+BU DIAN: &quot;Tiga tahun saya di sini. Nggak pernah ada yang ngatur saya.&quot;
+
+SHOT 4 (16-20s), 85mm CLOSE-UP from low beside the step-ladder facing RAFA, static: half
+his face burnt white by the window, the other half in deep shadow. He wipes his hands on a
+cloth. He does not answer.
+
+SHOT 5 (20-26s), 85mm CLOSE-UP from the opposite corner of the table facing RAFA, static:
+he looks down at her for the first time — flat, almost friendly.
+
+RAFA: &quot;Dian Puspitasari. Masuk dua ribu sebelas. Divisi personalia.&quot;
+
+SHOT 6 (26-30s), 85mm CLOSE-UP from beside the glass wall facing BU DIAN, extremely slow
+push: her arms come unfolded. She says nothing. Behind her, one of the twelve finally lifts
+his head.
+
+The shot ends on her face mid-realisation — no freeze frame, no fade to black.</pre></div></div>
+</div>
+<script>
+function showTab(ep, btn) {
+  document.querySelectorAll('.ep-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('tab-' + ep);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+function copyPrompt(id, btn) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const prev = btn.innerText;
+    btn.innerText = 'Tersalin!';
+    setTimeout(() => btn.innerText = prev, 1400);
+  });
+}
+</script>
+</body>
+</html>

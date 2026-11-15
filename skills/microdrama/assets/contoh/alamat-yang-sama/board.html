@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microdrama Studio — Alamat yang Sama</title>
+<style>
+  :root {
+    --bg: #0c0f14; --surface: #141922; --surface-2: #1b222e; --border: #262e3d;
+    --text: #eef2f7; --muted: #93a0b4; --accent: #f59e0b; --ok: #10b981; --err: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px 64px; }
+  .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 24px; }
+  h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: 17px; margin: 0 0 12px; font-weight: 600; }
+  h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 24px 0 10px; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .badge-ok { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.35); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .badge-err { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.35); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .grid-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .meta-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .meta-k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .meta-v { font-size: 14px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 20px; }
+  .bible-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .bible-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+  .bible-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: var(--accent); }
+  .file-pill { display: inline-block; font-family: ui-monospace, monospace; font-size: 11px; background: #0d121a; border: 1px solid var(--border); color: #cbd5e1; padding: 2px 7px; border-radius: 4px; margin: 2px 4px 2px 0; }
+  .mono-sm { font-family: ui-monospace, monospace; font-size: 11.5px; color: #cbd5e1; white-space: pre-wrap; margin: 8px 0 0; line-height: 1.45; }
+  .tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
+  .tab-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .tab-btn.active { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+  .ep-panel { display: none; }
+  .ep-panel.active { display: block; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface); }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); background: var(--surface-2); }
+  td.num { font-variant-numeric: tabular-nums; font-family: ui-monospace, monospace; white-space: nowrap; }
+  .risk-pill { background: rgba(245,158,11,0.14); color: #fbbf24; border: 1px solid rgba(245,158,11,0.35); padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .ok-pill { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.28); padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .prompt-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+  .prompt-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .att-row { margin-top: 4px; font-size: 12px; color: var(--muted); }
+  .copy-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 7px 13px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+  .copy-btn:hover { border-color: var(--accent); }
+  .copy-primary { background: #f59e0b; color: #0c0f14; border-color: #f59e0b; }
+  .tl-bar { display: flex; gap: 3px; margin-bottom: 10px; height: 28px; }
+  .tl-seg { background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 7px; font-size: 11px; font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; overflow: hidden; }
+  .tl-seg.seg-risk { border-color: rgba(245,158,11,0.65); background: rgba(245,158,11,0.08); }
+  .tl-sec { color: var(--muted); }
+  .prompt-pre { background: #0a0d12; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: #dbe3ee; white-space: pre-wrap; max-height: 360px; overflow-y: auto; margin: 0; }
+  .reuse-note { font-size: 13px; color: var(--accent); margin: 4px 0 12px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .issue-list { margin: 0; padding-left: 18px; font-size: 13px; }
+  .err-item { color: #f87171; margin-bottom: 4px; }
+  .warn-item { color: #fbbf24; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div>
+      <h1>Microdrama Studio · Alamat yang Sama</h1>
+      <div class="sub">pengemudi ojol yang mengantar paket ke alamat yang sama berulang kali, dan penerimanya</div>
+    </div>
+    <div class="badge-ok">25-Point Verifier: LOLOS (3 Ep · 2 Cast · 6 Set/Prop)</div>
+  </header>
+
+  <section class="grid-meta">
+    <div class="meta-box"><div class="meta-k">Format</div><div class="meta-v">Microdrama seri</div></div>
+    <div class="meta-box"><div class="meta-k">Rasio (UI AI Video)</div><div class="meta-v">9:16</div></div>
+    <div class="meta-box"><div class="meta-k">Durasi Target</div><div class="meta-v">30 detik per episode</div></div>
+    <div class="meta-box"><div class="meta-k">Bahasa Dialog</div><div class="meta-v">Indonesia</div></div>
+    <div class="meta-box"><div class="meta-k">Look</div><div class="meta-v">Jakarta siang hari</div></div>
+  </section>
+
+  
+
+  <section class="card">
+    <h2>Konsep & Rubrik</h2>
+    <p><strong>Logline:</strong> Seorang pengemudi ojol yang tidak pernah pergi sebelum paketnya diambil langsung mengantar ke alamat yang sama empat belas hari berturut-turut — pintu itu tidak pernah terbuka, tapi paket kemarin selalu sudah hilang dari teras.</p>
+    <p><strong>Hook Dipilih:</strong> **nomor 1 — suara dulu.**</p>
+    <p><strong>Rubrik:</strong> <code>Hook 5 · Spesifik 5 · Detail meleset 5 · Dialog 4 · Diam 5 · Tanam &amp; bayar 5 · Akhir 4 —</code></p>
+  </section>
+
+  <section class="card">
+    <h2>Cast & Set Bible Terkunci</h2>
+    <div class="bible-grid"><div class='bible-card'><div class='bible-head'><strong>ADIT</strong><code>[gambar_adit]</code></div><div class='file-pill'>adit_sheet.png</div><pre class='mono-sm'>Indonesian man, 27 years old, 170 cm, sun-darkened brown skin, short black hair flattened
+on top from wearing a helmet, narrow face with slightly hollow cheeks, a small dark mole on
+his left cheekbone, wiry thin build.
+WARDROBE: faded green ride-hailing driver jacket with grey reflective strips and no logos
+or lettering, plain grey crew-neck t-shirt underneath, dark blue jeans worn pale at the
+knees, worn black canvas sneakers, a black phone pouch on a strap across his chest.</pre></div><div class='bible-card'><div class='bible-head'><strong>IBU</strong><code>[gambar_ibu]</code></div><div class='file-pill'>ibu_sheet.png</div><pre class='mono-sm'>Indonesian woman, 63 years old, 150 cm, light brown skin, short grey hair pinned back with
+a single black clip, round face with a soft jaw, a small dark mole on her left cheekbone,
+small thin build, holds a plain wooden walking cane in her right hand.
+WARDROBE: loose faded batik house dress in brown and cream with short sleeves, a thin
+beige knitted cardigan, plain brown rubber sandals.</pre></div><div class='bible-card'><div class='bible-head'><strong>TERAS</strong><code>[gambar_teras]</code></div><div class='file-pill'>teras_plate.png</div><pre class='mono-sm'>Front terrace of a small single-storey house in a narrow inner-Jakarta residential lane.
+A frosted-glass aluminium sliding door with a thin curtain behind it and a one-finger gap
+along the bottom edge. Low green-painted iron fence and gate, potted snake plants along
+the wall. Old grey terrazzo floor tiles under an even, undisturbed layer of fine pale
+dust. Beside the door, a doorbell button with peeling cream paint and its wire hanging
+loose.</pre></div><div class='bible-card'><div class='bible-head'><strong>LORONG SAMPING</strong><code>[gambar_lorong]</code></div><div class='file-pill'>lorong_plate.png</div><pre class='mono-sm'>Narrow side passage between the house wall and the neighbour&#x27;s wall, barely shoulder
+width. Mossy grey cement walls. A row of blue plastic water drums, a sagging clothesline
+with two faded towels. Cracked cement floor with a shallow open drain channel. At the far
+end, a wooden kitchen door painted pale green, standing open a hand&#x27;s width.</pre></div><div class='bible-card'><div class='bible-head'><strong>RUANG TENGAH</strong><code>[gambar_ruang_tengah]</code></div><div class='file-pill'>ruang_tengah_plate.png</div><pre class='mono-sm'>Small living room of the same house, seen from inside. The frosted-glass sliding door
+fills one wall, daylight coming through it soft and milky. A white plastic chair placed
+close to the door, facing it. An old floral-patterned sofa pushed against the side wall,
+with an open doorway to the kitchen in the same wall. A doorway to a back bedroom hung
+with a faded floral curtain. Pale ceramic floor tiles. A low dark wooden cabinet with a
+single small framed photograph on top. Against the far wall, a waist-high stack of small
+brown cardboard boxes, every one still sealed with clear tape, none opened.</pre></div><div class='bible-card'><div class='bible-head'><strong>MOTOR</strong><code>[gambar_motor]</code></div><div class='file-pill'>motor_plate.png</div><pre class='mono-sm'>Dusty black automatic scooter with a small black top box behind the seat, a scuffed
+right side panel, no logos or lettering anywhere, licence plate blank.</pre></div><div class='bible-card'><div class='bible-head'><strong>PAKET</strong><span class='tag-muted'>teks-saja</span></div><pre class='mono-sm'>small brown cardboard box, roughly shoebox size, wrapped in clear packing tape, no
+labels, no printed text, no logos</pre></div><div class='bible-card'><div class='bible-head'><strong>FOTO</strong><span class='tag-muted'>teks-saja</span></div><pre class='mono-sm'>small framed photograph in a thin dark wooden frame: a boy about ten years old in a white
+short-sleeved school shirt, a small dark mole on his left cheekbone, smiling, faded
+colours</pre></div></div>
+  </section>
+
+  <nav class="tabs"><button class='tab-btn active' onclick="showTab('ep01', this)">EP01</button><button class='tab-btn' onclick="showTab('ep02', this)">EP02</button><button class='tab-btn' onclick="showTab('ep03', this)">EP03</button></nav>
+  <div id='tab-ep01' class='ep-panel active'><h2>Ep 01 · Pengantaran ke-14</h2><h3>Shot List & Audit Risiko</h3><div class='table-wrap'><table><thead><tr><th>Shot</th><th>Durasi</th><th>Set</th><th>Ukuran</th><th>Posisi Kamera</th><th>Dialog</th><th>Status</th></tr></thead><tbody><tr><td class='num'>s01</td><td class='num'>4s</td><td>Teras</td><td>ECU</td><td>tepat di atas lantai, menghadap ke bawah</td><td>SUARA HP</td><td><span class='risk-pill' title='ketiadaan benda yang harus terbaca (persegi bersih di debu) (dipertahankan — hook episode)'>RISIKO</span></td></tr><tr><td class='num'>s02</td><td class='num'>5s</td><td>Teras</td><td>WIDE</td><td>seberang gang</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s03</td><td class='num'>4s</td><td>Teras</td><td>CU</td><td>menempel dinding di samping pintu</td><td>—</td><td><span class='risk-pill' title='close-up tanpa wajah di dekat momen dialog (dipertahankan)'>RISIKO</span></td></tr><tr><td class='num'>s04</td><td class='num'>5s</td><td>Teras</td><td>MEDIUM</td><td>rendah, dari dalam pagar</td><td>—</td><td><span class='risk-pill' title='sudut yang tidak ada di plate (sudut balik dari pintu ke gang) (dipertahankan)'>RISIKO</span></td></tr><tr><td class='num'>s05</td><td class='num'>5s</td><td>Teras</td><td>CU</td><td>profil, dari pagar sisi kiri</td><td>Adit</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s06</td><td class='num'>3s</td><td>Teras</td><td>MEDIUM</td><td>dari gang, menembus jeruji pagar</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s07</td><td class='num'>4s</td><td>Teras → Ruang tengah</td><td>POV</td><td>setinggi lantai, dari celah bawah pintu</td><td>—</td><td><span class='risk-pill' title='shot lewat celah; tempat yang sama dari dua sisi pintu dalam satu generate (dipertahankan — sekalian menguji kemampuan multishot model)'>RISIKO</span></td></tr></tbody></table></div><h3>Prompt Aset (Gerbang 5)</h3><div class='prompt-box'><div class='prompt-top'><div><strong>Sheet karakter · ADIT</strong> · <span class='file-pill'>adit_sheet.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep01-gambar_adit', this)">Salin Prompt Aset</button></div><pre id='aset-ep01-gambar_adit' class='prompt-pre'>Character reference sheet for film production. Three panels side by side, separated by
+thin subtle vertical gaps. One continuous neutral dark grey seamless studio backdrop
+across all three panels. Soft even studio lighting, photorealistic cinematic photography,
+35mm film look, fine grain, muted desaturated colour.
+
+LEFT PANEL: tight close-up portrait, head and shoulders only, neutral expression, mouth
+closed, eyes looking straight into the lens, sharp focus on the eyes.
+
+MIDDLE PANEL: the SAME person, full body head to feet, standing straight facing the
+camera, head and face fully visible, arms relaxed at the sides, feet together, neutral
+expression.
+
+RIGHT PANEL: the SAME person, full body head to feet, standing straight seen from
+directly behind, head fully visible, arms relaxed at the sides, showing the back of the
+clothing.
+
+THE PERSON: Indonesian man, 27 years old, 170 cm, sun-darkened brown skin, short black hair flattened
+on top from wearing a helmet, narrow face with slightly hollow cheeks, a small dark mole on
+his left cheekbone, wiry thin build.
+
+WARDROBE: faded green ride-hailing driver jacket with grey reflective strips and no logos
+or lettering, plain grey crew-neck t-shirt underneath, dark blue jeans worn pale at the
+knees, worn black canvas sneakers, a black phone pouch on a strap across his chest.
+
+A clean white sans-serif label reading ADIT printed in the lower left corner of the left
+panel.
+
+The same person, the same face, the same clothing in all three panels. Photorealistic,
+not illustration.
+
+Avoid: more than one person per panel, different faces between panels, missing head,
+patterned or gradient background, hard shadows, dramatic camera angles, extra text,
+watermark, logo.</pre></div><div class='prompt-box'><div class='prompt-top'><div><strong>Set plate · Teras</strong> · <span class='file-pill'>teras_plate.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep01-gambar_teras', this)">Salin Prompt Aset</button></div><pre id='aset-ep01-gambar_teras' class='prompt-pre'>Photorealistic exterior photograph, absolutely no people in frame.
+
+Front terrace of a small single-storey house in a narrow inner-Jakarta residential lane.
+A frosted-glass aluminium sliding door with a thin curtain behind it and a one-finger gap
+along the bottom edge. Low green-painted iron fence and gate, potted snake plants along
+the wall. Old grey terrazzo floor tiles under an even, undisturbed layer of fine pale
+dust. Beside the door, a doorbell button with peeling cream paint and its wire hanging
+loose.
+
+Midday, hard sun almost directly overhead, short shadows falling straight down. 24mm lens,
+eye height, level horizon, straight-on composition from the lane looking at the door.
+
+Avoid: people, text, signage, house numbers, packages, footprints in the dust, extra
+furniture, coloured practical lights, lens flare, watermark.</pre></div><div class='prompt-box'><div class='prompt-top'><div><strong>Set plate · Ruang tengah</strong> · <span class='file-pill'>ruang_tengah_plate.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep01-gambar_ruang_tengah', this)">Salin Prompt Aset</button></div><pre id='aset-ep01-gambar_ruang_tengah' class='prompt-pre'>Photorealistic interior photograph, absolutely no people in frame.
+
+Small living room of the same house, seen from inside. The frosted-glass sliding door
+fills one wall, daylight coming through it soft and milky. A white plastic chair placed
+close to the door, facing it. An old floral-patterned sofa pushed against the side wall,
+with an open doorway to the kitchen in the same wall. A doorway to a back bedroom hung
+with a faded floral curtain. Pale ceramic floor tiles. A low dark wooden cabinet with a
+single small framed photograph on top. Against the far wall, a waist-high stack of small
+brown cardboard boxes, every one still sealed with clear tape, none opened.
+
+Midday, soft milky daylight coming only through the frosted sliding door, no lamps on.
+24mm lens, eye height, level horizon, straight-on composition.
+
+Avoid: people, text, television, ceiling lights switched on, opened boxes, coloured
+practical lights, lens flare, watermark.</pre></div><div class='prompt-box'><div class='prompt-top'><div><strong>Plate properti · Motor</strong> · <span class='file-pill'>motor_plate.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep01-gambar_motor', this)">Salin Prompt Aset</button></div><pre id='aset-ep01-gambar_motor' class='prompt-pre'>Photorealistic reference photograph of a single vehicle, absolutely no people.
+
+Dusty black automatic scooter with a small black top box behind the seat, a scuffed
+right side panel, no logos or lettering anywhere, licence plate blank.
+
+Plain neutral grey seamless studio backdrop, soft even studio lighting. Three-quarter
+front view from the right side so the scuffed panel is visible, 35mm lens, eye height,
+the whole scooter in frame with space around it.
+
+Avoid: people, rider, helmet on the seat, text, logos, brand names, licence plate
+numbers, extra accessories, watermark.</pre></div><h3>Prompt Video (Gerbang 6)</h3><div class='prompt-box'><div class='prompt-top'><div><strong>Scene 1 · Teras · 30 detik</strong><div class='att-row'>Lampirkan: <span class='file-pill'>adit_sheet.png</span><span class='file-pill'>teras_plate.png</span><span class='file-pill'>ruang_tengah_plate.png</span><span class='file-pill'>motor_plate.png</span></div></div><button class='copy-btn copy-primary' onclick="copyPrompt('vid-ep01-0', this)">Salin Prompt Video</button></div><div class='tl-bar'><div class='tl-seg seg-risk' style='width:13.33%' title='SHOT 1 (0-4s) 50mm CLOSE-UP, low over the terrace floor, a slow | RISIKO: ketiadaan benda yang harus terbaca (persegi bersih di debu) (dipertahankan — hook episode)'><span class='tl-id'>S1</span><span class='tl-sec'>4s</span></div><div class='tl-seg' style='width:16.67%' title='SHOT 2 (4-9s) 35mm WIDE, static, from far back across the'><span class='tl-id'>S2</span><span class='tl-sec'>5s</span></div><div class='tl-seg seg-risk' style='width:13.33%' title='SHOT 3 (9-13s) 85mm CLOSE-UP, static, flat against the outside | RISIKO: close-up tanpa wajah di dekat momen dialog (dipertahankan)'><span class='tl-id'>S3</span><span class='tl-sec'>4s</span></div><div class='tl-seg seg-risk' style='width:16.67%' title='SHOT 4 (13-18s) 35mm MEDIUM, REVERSE | RISIKO: sudut yang tidak ada di plate (sudut balik dari pintu ke gang) (dipertahankan)'><span class='tl-id'>S4</span><span class='tl-sec'>5s</span></div><div class='tl-seg' style='width:16.67%' title='SHOT 5 (18-23s) 85mm CLOSE-UP in profile from the left end of the'><span class='tl-id'>S5</span><span class='tl-sec'>5s</span></div><div class='tl-seg' style='width:10.00%' title='SHOT 6 (23-26s) 35mm MEDIUM, static, from out in'><span class='tl-id'>S6</span><span class='tl-sec'>3s</span></div><div class='tl-seg seg-risk' style='width:13.33%' title='SHOT 7 (26-30s) 50mm, static, the lens | RISIKO: shot lewat celah; tempat yang sama dari dua sisi pintu dalam satu generate (dipertahankan — sekalian menguji kemampuan multishot model)'><span class='tl-id'>S7</span><span class='tl-sec'>4s</span></div></div><pre id='vid-ep01-0' class='prompt-pre'>VIDEO STYLE &amp; FORMAT
+30-second scene in the style of a modern Indonesian short drama. ONE continuous moment — a
+single midday delivery to one house, NOT a trailer, NOT a montage — covered like a real
+film: cut between MULTIPLE camera positions, angles changing every few seconds while the
+moment flows continuously. Quiet, patient pacing; long stillness is intended. Naturalistic,
+underplayed acting. Look: warm-neutral filmic colour grading, fine film grain, shallow
+depth of field, accurate Indonesian skin tones, bright midday light that never blows out.
+This is a quiet family drama, NOT horror and NOT a thriller. NOT sinetron, NO dramatic
+zooms, NO jump scares, NO rapid cutting.
+
+LANGUAGE
+All spoken words in INDONESIAN (Bahasa Indonesia), Jakarta register, casual spoken form —
+not formal news-reader Indonesian. Speak the lines exactly as written in the breakdown
+below: do not translate them, do not paraphrase them, do not invent extra lines. Exactly
+TWO lines are spoken in the whole scene: the phone-app voice once in SHOT 1, and Adit once
+in SHOT 5. In every other shot nobody speaks, and Adit&#x27;s mouth stays closed — no
+muttering, no repeating his line early. No subtitles, no captions, no on-screen text of
+any kind burned into the frame. Character names are never spoken aloud unless they appear
+inside the quotation marks.
+
+OPTICS
+Base 35mm spherical at T2.0 — natural perspective, SHALLOW depth of field. Close-ups step
+up to 85mm (FOV approx 24 degrees) to isolate Adit from what is behind him. The opening
+floor shot and the final view through the gap use a 50mm. Per-shot lens is specified in
+the breakdown. No wide-angle distortion, no fisheye, no zoom moves.
+
+CAMERA
+Every cut moves to a DIFFERENT physical position. SHOTS 1 to 6 are all OUTSIDE the house;
+SHOT 7 is the only view of the inside, and it is seen through the gap under the door.
+SHOT 4 is a REVERSE ANGLE: the camera stands at the sliding door, outside, and looks OUT
+across the terrace toward the gate and the lane. The other positions: low over the
+terrace floor, far back across the lane, flat against the wall beside the door, at the
+left end of the terrace, out in the lane through the fence bars, and at floor level at
+the gap under the door. Never two consecutive shots from the same position. Each shot
+begins with a location tag — follow it. Locked-off tripod shots, with only two slow
+pushes; no handheld shake, no orbit, no crane. No slow-motion.
+
+LIGHTING
+Hard midday sun almost directly overhead, undiffused — short black shadows straight under
+every object, the terrazzo dust glowing white where the sun hits it. The terrace roof
+overhang throws a hard-edged band of shade across the sliding door; inside that band the
+light turns cool and soft, bounced up from the sunlit lane. In the reverse angle, the
+sunlit lane behind Adit is brighter than his face, which sits in the shade of the
+overhang. Daylight 5600K throughout; the only strong colour note is the faded green of
+Adit&#x27;s jacket against grey stone. High contrast, but faces in shade keep their detail —
+never crushed to black. In the final view through the gap, the room inside is lit only by
+milky diffused daylight coming through the frosted glass, soft and directionless.
+
+CRITICAL
+ONE character only: Adit, exactly one of him. Nobody else appears at any point — the
+lane, the terrace and the room inside are empty of people. Adit is OUTSIDE the house in
+every shot; he never enters it. Adit keeps the exact face, hairstyle and clothing from his
+reference image in every shot. No face swapping, no morphing, no duplicated people.
+Exactly ONE scooter and exactly ONE package in the whole scene — never duplicated, never
+vanishing between cuts (see CONTINUITY). Every shot contains visible movement — a person,
+a hand, the camera, a leaf, or drifting dust; no frozen still frames. Accurate Indonesian
+lip-sync on his one line. His phone screen is always angled away from camera — no
+readable screen.
+
+CHARACTERS (from reference images)
+ADIT [gambar_adit] — 27, faded green driver jacket with no logos, grey t-shirt, dark
+jeans, black phone pouch across the chest, delivering a package to a house where nobody
+ever answers.
+BACKGROUND — none.
+
+LOCATION (from references)
+Two of the reference images show the SAME house from the two opposite sides of the SAME
+frosted sliding door:
+- [gambar_teras] is the OUTSIDE — the terrace, the fence, the lane. SHOTS 1 to 6 all
+  happen here, outside the house.
+- [gambar_ruang_tengah] is the INSIDE — the living room. It is used ONLY in SHOT 7, and
+  only as seen from floor level through the gap under the door. No other shot shows the
+  inside of the house.
+Whenever the sliding door appears in SHOTS 1 to 6, it is seen from OUTSIDE.
+The terrace [gambar_teras] — Front terrace of a small single-storey house in a narrow
+inner-Jakarta residential lane. A frosted-glass aluminium sliding door with a thin
+curtain behind it and a one-finger gap along the bottom edge. Low green-painted iron
+fence and gate, potted snake plants along the wall. Old grey terrazzo floor tiles under
+an even, undisturbed layer of fine pale dust. Beside the door, a doorbell button with
+peeling cream paint and its wire hanging loose.
+The living room, SHOT 7 only [gambar_ruang_tengah] — Small living room of the same house,
+seen from inside. The frosted-glass sliding door fills one wall, daylight coming through
+it soft and milky. A white plastic chair placed close to the door, facing it. An old
+floral-patterned sofa pushed against the side wall, with an open doorway to the kitchen
+in the same wall. A doorway to a back bedroom hung with a faded floral curtain. Pale
+ceramic floor tiles. A low dark wooden cabinet with a single small framed photograph on
+top. Against the far wall, a waist-high stack of small brown cardboard boxes, every one
+still sealed with clear tape, none opened.
+Adit&#x27;s scooter [gambar_motor] — Dusty black automatic scooter with a small black top box
+behind the seat, a scuffed right side panel, no logos or lettering anywhere, licence
+plate blank.
+The package — small brown cardboard box, roughly shoebox size, wrapped in clear packing
+tape, no labels, no printed text, no logos
+
+CONTINUITY
+People and objects persist between cuts exactly where they were left. Nothing appears or
+disappears between cuts unless Adit moves it on screen.
+- ADIT: outside the house for the WHOLE scene — in the lane or on the terrace. He never
+  opens the sliding door and never steps inside.
+- THE SCOOTER: from SHOT 2 to the end of the scene it stays parked IN THE LANE, directly
+  in front of the gate, on the far side of the fence from the house. The fence and the
+  gate are always BETWEEN the scooter and the terrace. It never enters the yard. It is
+  visible in every shot that looks toward the lane (SHOT 2 and SHOT 4); in the other
+  shots it is behind the camera or outside the frame — never gone.
+- THE GATE: Adit walks through it in SHOT 2 and leaves it standing half open for the rest
+  of the scene.
+- THE PACKAGE: Adit carries it from SHOT 2 to SHOT 4. From SHOT 4 to the end of the scene
+  it sits on the terrace floor exactly on the clean rectangle in the dust, one step to the
+  left of the sliding door. It is visible in every shot that shows that part of the floor
+  (SHOT 4 and SHOT 6).
+
+AUDIO
+Midday lane ambience: distant motorbikes, cicadas droning in the heat, a neighbour&#x27;s radio
+barely audible. A dry leaf scraping across stone. The scooter engine cutting off. The
+doorbell press makes NO ring — only the dry click of a dead plastic button. Cardboard set
+down on stone. The phone-app voice is flat and synthetic, coming from Adit&#x27;s chest pouch,
+in SHOT 1 only. NO musical score at all. Adit&#x27;s one line spoken quietly, almost to
+himself, in SHOT 5 only.
+
+MOVEMENT NOTE
+Adit is still. He stands with his weight on one leg and his thumb on his phone, and he
+does not shift, pace or look around. Every movement he makes is small and finished: one
+press of the bell, then a second; the box set down exactly and squared with both hands.
+He never sits — when he goes down, he crouches.
+
+SHOT BREAKDOWN
+
+SCENE [00:00-00:30] TERAS — one continuous midday delivery, cut between positions:
+
+SHOT 1 (0-4s) — OUTSIDE, terrace floor — 50mm CLOSE-UP, low over the terrace floor, a slow
+push forward toward the closed sliding door: a thin film of pale dust on grey terrazzo —
+barely there, no sand, no heaps — with dust motes drifting in a shaft of sun. In the
+middle of the floor, one sharp-edged rectangle where the dust is missing and the bare grey
+stone shows through, the size of a shoebox: flat, level with the floor, nothing on it, not
+an object. No footprints anywhere around it. A dry leaf skitters across the floor in a
+small gust of wind and stops at the edge of the rectangle.
+
+PHONE VOICE (off-screen, flat, synthetic): &quot;Pesanan baru. Alamat yang sama.&quot;
+
+SHOT 2 (4-9s) — OUTSIDE, lane and terrace — 35mm WIDE, static, from far back across the
+lane. The sunlit lane fills the bottom of the frame; behind it the low green fence and its
+gate standing half open; behind the fence, the terrace and the house. The dusty black
+scooter pulls up IN THE LANE and stops in front of the gate, outside the fence. ADIT cuts
+the engine, gets off in the lane, takes the one package from the top box, and walks
+through the half-open gate onto the terrace. The scooter stays parked in the lane behind
+him. No dialogue — lane ambience only.
+
+SHOT 3 (9-13s) — OUTSIDE, beside the door — 85mm CLOSE-UP, static, flat against the outside
+wall beside the door; behind his hand, the peeling cream wall: Adit&#x27;s finger presses the
+doorbell with peeling cream paint, its wire hanging loose. Only a dry plastic click — no
+ring. He presses once more. Nothing. The package is tucked under his other arm at the edge
+of the frame. His mouth stays closed.
+
+SHOT 4 (13-18s) — OUTSIDE, terrace, camera at the door looking out — 35mm MEDIUM, REVERSE
+ANGLE, static, low: in the foreground Adit bends and sets the package down exactly on the
+clean rectangle in the dust, close to the camera, squares it with both hands, and
+straightens, facing the door and the camera; frame his whole body, head to feet. Behind
+him, across the sunlit terrace: the half-open gate, the fence, and his scooter parked in
+the lane beyond it. Weight on one leg, thumb on his phone, screen angled away from camera.
+He does not leave. His mouth stays closed. No dialogue — five seconds of lane ambience.
+
+SHOT 5 (18-23s) — OUTSIDE, terrace — 85mm CLOSE-UP in profile from the left end of the
+terrace, very slow push in; behind him, soft, the sliding door seen from outside: sweat at
+his temple, his eyes on the door.
+
+ADIT (quietly, to the door, not to anyone): &quot;Saya tunggu, ya.&quot;
+
+SHOT 6 (23-26s) — OUTSIDE, terrace, seen from the lane — 35mm MEDIUM, static, from out in
+the lane, looking through the iron bars of the fence toward the house: Adit, on the
+terrace, crouches — he does not sit — right beside the package, still on the floor at his
+left knee where he set it, and lowers his cheek almost to the dust, one eye to the gap
+along the bottom of the sliding door. We see the door from OUTSIDE; the inside of the
+house is not visible in this shot.
+
+SHOT 7 (26-30s) — INSIDE, living-room floor, seen through the gap — 50mm, static, the lens
+at floor level right at the gap under the sliding door, looking into the empty living
+room: a thin bright band of room between the dark bottom edge of the door and the
+terrace floor. Inside, across pale ceramic tiles: the base of a stack of sealed brown
+cardboard boxes, and the four legs of an empty white plastic chair facing the door.
+Everything inside is still. In the foreground, on the terrace side of the gap, a small
+drift of dust blows slowly across.
+
+The shot ends with the dust still moving — no freeze frame, no fade to black.</pre></div></div><div id='tab-ep02' class='ep-panel'><h2>Ep 02 · Pintu Dapur</h2><h3>Shot List & Audit Risiko</h3><div class='table-wrap'><table><thead><tr><th>Shot</th><th>Durasi</th><th>Set</th><th>Ukuran</th><th>Posisi Kamera</th><th>Dialog</th><th>Status</th></tr></thead><tbody><tr><td class='num'>s01</td><td class='num'>5s</td><td>Lorong samping</td><td>WIDE</td><td>ujung lorong sisi gang</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s02</td><td class='num'>5s</td><td>Lorong samping</td><td>MEDIUM</td><td>di depan Adit, bergerak mundur bersamanya</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s03</td><td class='num'>4s</td><td>Lorong samping</td><td>MEDIUM CLOSE-UP</td><td>dari balik bahu Adit</td><td>Adit</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s04</td><td class='num'>5s</td><td>Ruang tengah</td><td>WIDE</td><td>sudut jauh ruang tengah</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s05</td><td class='num'>4s</td><td>Ruang tengah</td><td>CU</td><td>di samping tumpukan kardus</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s06</td><td class='num'>4s</td><td>Ruang tengah</td><td>MEDIUM</td><td>dari balik sofa</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s07</td><td class='num'>3s</td><td>Ruang tengah</td><td>ECU</td><td>di depan lemari, setinggi foto</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr></tbody></table></div><h3>Prompt Aset (Gerbang 5)</h3><p class='reuse-note'>Pakai ulang dari ep 01, jangan generate ulang: `adit_sheet.png`, `ruang_tengah_plate.png`.</p><div class='prompt-box'><div class='prompt-top'><div><strong>Set plate · Lorong samping</strong> · <span class='file-pill'>lorong_plate.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep02-gambar_lorong', this)">Salin Prompt Aset</button></div><pre id='aset-ep02-gambar_lorong' class='prompt-pre'>Photorealistic exterior photograph, absolutely no people in frame.
+
+Narrow side passage between the house wall and the neighbour&#x27;s wall, barely shoulder
+width. Mossy grey cement walls. A row of blue plastic water drums, a sagging clothesline
+with two faded towels. Cracked cement floor with a shallow open drain channel. At the far
+end, a wooden kitchen door painted pale green, standing open a hand&#x27;s width.
+
+Midday, a narrow strip of hard sun falling straight down between the two walls onto the
+floor, the walls above it in cool shade. 24mm lens, eye height, level horizon, looking
+straight down the passage toward the kitchen door.
+
+Avoid: people, text, signage, extra objects in the passage, coloured practical lights,
+lens flare, watermark.</pre></div><h3>Prompt Video (Gerbang 6)</h3><div class='prompt-box'><div class='prompt-top'><div><strong>Scene 1 · Lorong samping · 14 detik</strong><div class='att-row'>Lampirkan: <span class='file-pill'>adit_sheet.png</span><span class='file-pill'>lorong_plate.png</span></div></div><button class='copy-btn copy-primary' onclick="copyPrompt('vid-ep02-0', this)">Salin Prompt Video</button></div><div class='tl-bar'><div class='tl-seg' style='width:35.71%' title='SHOT 1 (0-5s) , 35mm WIDE, static, from the lane end of the passage'><span class='tl-id'>S1</span><span class='tl-sec'>5s</span></div><div class='tl-seg' style='width:35.71%' title='SHOT 2 (5-10s) , 35mm MEDIUM, a slow backward track ahead of him inside the passage'><span class='tl-id'>S2</span><span class='tl-sec'>5s</span></div><div class='tl-seg' style='width:28.57%' title='SHOT 3 (10-14s) , 50mm MEDIUM CLOSE-UP, static, over his shoulder at the kitchen door'><span class='tl-id'>S3</span><span class='tl-sec'>4s</span></div></div><pre id='vid-ep02-0' class='prompt-pre'>VIDEO STYLE &amp; FORMAT
+14-second scene in the style of a modern Indonesian short drama. ONE continuous movement —
+a man edging down a narrow side passage toward a kitchen door, NOT a trailer, NOT a
+montage — covered like a real film: cut between MULTIPLE camera positions while the
+movement flows continuously. Quiet, careful pacing. Naturalistic, underplayed acting.
+Look: warm-neutral filmic colour grading, fine film grain, shallow depth of field,
+accurate Indonesian skin tones, bright midday light that never blows out. This is a quiet
+family drama, NOT horror and NOT a thriller. NOT sinetron, NO dramatic zooms, NO jump
+scares, NO rapid cutting.
+
+LANGUAGE
+All spoken words in INDONESIAN (Bahasa Indonesia), Jakarta register, casual spoken form —
+not formal news-reader Indonesian. Speak the lines exactly as written in the breakdown
+below: do not translate them, do not paraphrase them, do not invent extra lines. Adit is
+the only voice, and he speaks one word. No subtitles, no captions, no on-screen text of
+any kind burned into the frame. Character names are never spoken aloud unless they appear
+inside the quotation marks.
+
+OPTICS
+Base 35mm spherical at T2.0 — natural perspective, SHALLOW depth of field, the far end of
+the passage falling soft. The over-the-shoulder shot at the door uses 50mm. Per-shot lens
+is specified in the breakdown. No wide-angle distortion, no fisheye, no zoom moves.
+
+CAMERA
+Every cut moves to a DIFFERENT physical position — at the lane end of the passage, inside
+the passage moving backward ahead of Adit, and over his shoulder at the kitchen door.
+Never two consecutive shots from the same position. One slow backward track; everything
+else locked off. No handheld shake, no orbit, no crane. No slow-motion.
+
+LIGHTING
+A narrow strip of hard midday sun falls straight down between the two walls and lies
+along the cracked floor; everything above waist height sits in cool green-grey shade
+bounced off mossy cement. When Adit passes through the strip, the sun lights his
+shoulders for a moment and leaves them again. The kitchen doorway at the far end is a
+black slot — no light inside. Daylight 5600K; the only strong colour note is the blue of
+the water drums. Moderate contrast, shade never crushed to black.
+
+CRITICAL
+ONE character only. Nobody else appears at any point — the lane behind him and the
+passage are empty of people. Adit keeps the exact face, hairstyle and clothing from his
+reference image in every shot, including the small dark mole on his left cheekbone. No
+face swapping, no morphing, no duplicated people. Accurate Indonesian lip-sync on his one
+word.
+
+CHARACTERS (from reference images)
+ADIT [gambar_adit] — 27, faded green driver jacket with no logos, grey t-shirt, dark
+jeans, black phone pouch across the chest, edging sideways down a narrow passage with a
+package under his arm.
+BACKGROUND — none.
+
+LOCATION (from references)
+The side passage [gambar_lorong] — Narrow side passage between the house wall and the
+neighbour&#x27;s wall, barely shoulder width. Mossy grey cement walls. A row of blue plastic
+water drums, a sagging clothesline with two faded towels. Cracked cement floor with a
+shallow open drain channel. At the far end, a wooden kitchen door painted pale green,
+standing open a hand&#x27;s width.
+The package — small brown cardboard box, roughly shoebox size, wrapped in clear packing
+tape, no labels, no printed text, no logos
+
+AUDIO
+Lane ambience fading as he goes deeper into the passage. Water dripping from the towels
+onto cement. His jacket scraping the wall. The kitchen door&#x27;s hinge giving one small
+creak as it swings. NO musical score at all.
+
+MOVEMENT NOTE
+Adit moves like someone who knows he should not be here: sideways, shoulders turned,
+careful steps over the drain, and only one backward glance at the lane. He does not hurry
+and he does not creep — he is still a delivery man, and he carries the package the way he
+carries every package, flat on his forearm.
+
+SHOT BREAKDOWN
+
+SCENE [00:00-00:14] LORONG SAMPING — one continuous movement down the passage, cut between
+positions:
+
+SHOT 1 (0-5s), 35mm WIDE, static, from the lane end of the passage: ADIT glances back once
+at the empty lane, then turns sideways and edges into the passage, package under his arm,
+past the row of blue water drums. No dialogue.
+
+SHOT 2 (5-10s), 35mm MEDIUM, a slow backward track ahead of him inside the passage: his
+shoulder brushes the mossy wall, a faded towel on the sagging line drags across his face,
+he steps over the open drain channel. No dialogue — dripping water, his jacket scraping
+cement.
+
+SHOT 3 (10-14s), 50mm MEDIUM CLOSE-UP, static, over his shoulder at the kitchen door: the
+pale green door ahead, open a hand&#x27;s width onto darkness. His free hand pushes it; it
+swings inward with one small creak.
+
+ADIT (almost a whisper, into the dark): &quot;Permisi...&quot;
+
+The shot ends as he starts to step through — no freeze frame, no fade to black.</pre></div><div class='prompt-box'><div class='prompt-top'><div><strong>Scene 2 · Ruang tengah · 16 detik</strong><div class='att-row'>Lampirkan: <span class='file-pill'>adit_sheet.png</span><span class='file-pill'>ruang_tengah_plate.png</span></div></div><button class='copy-btn copy-primary' onclick="copyPrompt('vid-ep02-1', this)">Salin Prompt Video</button></div><div class='tl-bar'><div class='tl-seg' style='width:31.25%' title='SHOT 1 (0-5s) , 35mm WIDE, static, from the far corner of the room'><span class='tl-id'>S1</span><span class='tl-sec'>5s</span></div><div class='tl-seg' style='width:25.00%' title='SHOT 2 (5-9s) , 85mm CLOSE-UP, static, from beside the stack of boxes'><span class='tl-id'>S2</span><span class='tl-sec'>4s</span></div><div class='tl-seg' style='width:25.00%' title='SHOT 3 (9-13s) , 35mm MEDIUM, very slow push, from behind the floral sofa'><span class='tl-id'>S3</span><span class='tl-sec'>4s</span></div><div class='tl-seg' style='width:18.75%' title='SHOT 4 (13-16s) , 100mm macro EXTREME CLOSE-UP, static, in front of the cabinet at the'><span class='tl-id'>S4</span><span class='tl-sec'>3s</span></div></div><pre id='vid-ep02-1' class='prompt-pre'>VIDEO STYLE &amp; FORMAT
+16-second scene in the style of a modern Indonesian short drama. ONE continuous moment —
+a man standing in a stranger&#x27;s living room, NOT a trailer, NOT a montage — covered like a
+real film: cut between MULTIPLE camera positions while the moment flows continuously.
+Slow pacing; he looks before he moves. Naturalistic, underplayed acting. Look:
+warm-neutral filmic colour grading, fine film grain, shallow depth of field, accurate
+Indonesian skin tones. This is a quiet family drama, NOT horror and NOT a thriller. NOT
+sinetron, NO dramatic zooms, NO jump scares, NO rapid cutting.
+
+LANGUAGE
+This scene has NO spoken dialogue — no voices, no narration, no inner monologue, no
+whispering. No subtitles, no captions, no on-screen text of any kind burned into the
+frame.
+
+OPTICS
+Base 35mm spherical at T2.0 — natural perspective, SHALLOW depth of field. Close-ups step
+up to 85mm (FOV approx 24 degrees). The final detail on the photograph uses a 100mm
+macro. Per-shot lens is specified in the breakdown. No wide-angle distortion, no fisheye,
+no zoom moves.
+
+CAMERA
+Every cut moves to a DIFFERENT physical position — the far corner of the room, beside the
+stack of boxes, behind the floral sofa, and in front of the cabinet at the height of the
+photograph. Never two consecutive shots from the same position. One very slow push;
+everything else locked off. No handheld shake, no orbit, no crane. No slow-motion.
+
+LIGHTING
+One large soft source: midday daylight coming through the frosted-glass sliding door,
+milky and directionless near the door, falling off quickly toward the back of the room.
+No lamps or ceiling lights on. Faces turned toward the door glow softly; faces turned
+away go into deep warm-grey shadow. The only warm note is the brown cardboard of the
+stacked boxes catching the door light. Low-key, gentle contrast, never flat front light.
+The glass of the framed photograph catches a soft reflection of the door.
+
+CRITICAL
+ONE character only. Nobody else appears at any point — the white plastic chair is EMPTY,
+and the bedroom doorway shows only its curtain. Adit keeps the exact face, hairstyle and
+clothing from his reference image in every shot, including the small dark mole on his
+left cheekbone. No face swapping, no morphing, no duplicated people.
+
+CHARACTERS (from reference images)
+ADIT [gambar_adit] — 27, faded green driver jacket with no logos, grey t-shirt, dark
+jeans, black phone pouch across the chest, standing inside a stranger&#x27;s living room,
+still holding the package.
+BACKGROUND — none.
+
+LOCATION (from references)
+The living room [gambar_ruang_tengah] — Small living room of the same house, seen from
+inside. The frosted-glass sliding door fills one wall, daylight coming through it soft
+and milky. A white plastic chair placed close to the door, facing it. An old
+floral-patterned sofa pushed against the side wall, with an open doorway to the kitchen
+in the same wall. A doorway to a back bedroom hung with a faded floral curtain. Pale
+ceramic floor tiles. A low dark wooden cabinet with a single small framed photograph on
+top. Against the far wall, a waist-high stack of small brown cardboard boxes, every one
+still sealed with clear tape, none opened.
+The package in his hand — small brown cardboard box, roughly shoebox size, wrapped in
+clear packing tape, no labels, no printed text, no logos
+The photograph on the cabinet — small framed photograph in a thin dark wooden frame: a
+boy about ten years old in a white short-sleeved school shirt, a small dark mole on his
+left cheekbone, smiling, faded colours
+
+AUDIO
+Near silence. The sealed stillness of an indoor room, the lane only faintly audible
+through the glass. A clock ticking somewhere in the house, never seen. Adit&#x27;s sneakers on
+ceramic tile. NO musical score at all.
+
+MOVEMENT NOTE
+Adit stops just inside the doorway and stays stopped longer than is comfortable. When he
+moves again it is slowly and in straight lines — to the boxes, then to the cabinet. He
+looks before he moves, and he does not touch anything until the very last moment.
+
+SHOT BREAKDOWN
+
+SCENE [00:00-00:16] RUANG TENGAH — one continuous moment in the living room, cut between
+positions:
+
+SHOT 1 (0-5s), 35mm WIDE, static, from the far corner of the room: ADIT steps in through
+the open kitchen doorway and stops. Milky light from the frosted sliding door; the
+waist-high stack of sealed boxes against the far wall; the white plastic chair close to
+the door, facing it — empty. No dialogue.
+
+SHOT 2 (5-9s), 85mm CLOSE-UP, static, from beside the stack of boxes: Adit&#x27;s eyes travel
+along the stack, then down to the package in his own hand — the same brown box, the same
+clear tape. No dialogue.
+
+SHOT 3 (9-13s), 35mm MEDIUM, very slow push, from behind the floral sofa: he walks toward
+the low wooden cabinet; halfway there, something on top of it stops him. No dialogue.
+
+SHOT 4 (13-16s), 100mm macro EXTREME CLOSE-UP, static, in front of the cabinet at the
+height of the photograph: the small framed photograph of the boy, Adit&#x27;s face reflected
+faintly in its glass. His hand enters the frame, reaching toward it.
+
+The shot ends as his fingers are about to touch the frame — no freeze frame, no fade to
+black.</pre></div></div><div id='tab-ep03' class='ep-panel'><h2>Ep 03 · Yang Ditunggu</h2><h3>Shot List & Audit Risiko</h3><div class='table-wrap'><table><thead><tr><th>Shot</th><th>Durasi</th><th>Set</th><th>Ukuran</th><th>Posisi Kamera</th><th>Dialog</th><th>Status</th></tr></thead><tbody><tr><td class='num'>s01</td><td class='num'>3s</td><td>Ruang tengah</td><td>ECU</td><td>di depan lemari</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s02</td><td class='num'>5s</td><td>Ruang tengah</td><td>WIDE</td><td>dari ambang pintu dapur</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s03</td><td class='num'>4s</td><td>Ruang tengah</td><td>CU</td><td>dari samping lemari</td><td>Ibu</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s04</td><td class='num'>3s</td><td>Ruang tengah</td><td>CU</td><td>rendah, di samping tumpukan kardus</td><td>Adit</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s05</td><td class='num'>7s</td><td>Ruang tengah</td><td>MEDIUM</td><td>dari balik sofa</td><td>Adit, Ibu</td><td><span class='ok-pill'>AMAN</span></td></tr><tr><td class='num'>s06</td><td class='num'>8s</td><td>Ruang tengah</td><td>MEDIUM CLOSE-UP</td><td>rendah, di samping kursi plastik</td><td>—</td><td><span class='ok-pill'>AMAN</span></td></tr></tbody></table></div><h3>Prompt Aset (Gerbang 5)</h3><p class='reuse-note'>Pakai ulang dari ep 01, jangan generate ulang: `adit_sheet.png`, `ruang_tengah_plate.png`.</p><div class='prompt-box'><div class='prompt-top'><div><strong>Sheet karakter · IBU</strong> · <span class='file-pill'>ibu_sheet.png</span></div><button class='copy-btn' onclick="copyPrompt('aset-ep03-gambar_ibu', this)">Salin Prompt Aset</button></div><pre id='aset-ep03-gambar_ibu' class='prompt-pre'>Character reference sheet for film production. Three panels side by side, separated by
+thin subtle vertical gaps. One continuous neutral dark grey seamless studio backdrop
+across all three panels. Soft even studio lighting, photorealistic cinematic photography,
+35mm film look, fine grain, muted desaturated colour.
+
+LEFT PANEL: tight close-up portrait, head and shoulders only, neutral expression, mouth
+closed, eyes looking straight into the lens, sharp focus on the eyes.
+
+MIDDLE PANEL: the SAME person, full body head to feet, standing as straight as she can
+facing the camera, head and face fully visible, left arm relaxed at her side, right hand
+resting on the walking cane, neutral expression.
+
+RIGHT PANEL: the SAME person, full body head to feet, standing seen from directly behind,
+head fully visible, left arm relaxed at her side, right hand resting on the walking cane,
+showing the back of the clothing.
+
+THE PERSON: Indonesian woman, 63 years old, 150 cm, light brown skin, short grey hair pinned back with
+a single black clip, round face with a soft jaw, a small dark mole on her left cheekbone,
+small thin build, holds a plain wooden walking cane in her right hand.
+
+WARDROBE: loose faded batik house dress in brown and cream with short sleeves, a thin
+beige knitted cardigan, plain brown rubber sandals.
+
+A clean white sans-serif label reading IBU printed in the lower left corner of the left
+panel.
+
+The same person, the same face, the same clothing in all three panels. Photorealistic,
+not illustration.
+
+Avoid: more than one person per panel, different faces between panels, missing head,
+patterned or gradient background, hard shadows, dramatic camera angles, extra text,
+watermark, logo.</pre></div><h3>Prompt Video (Gerbang 6)</h3><div class='prompt-box'><div class='prompt-top'><div><strong>Scene 1 · Ruang tengah · 30 detik</strong><div class='att-row'>Lampirkan: <span class='file-pill'>adit_sheet.png</span><span class='file-pill'>ibu_sheet.png</span><span class='file-pill'>ruang_tengah_plate.png</span></div></div><button class='copy-btn copy-primary' onclick="copyPrompt('vid-ep03-0', this)">Salin Prompt Video</button></div><div class='tl-bar'><div class='tl-seg' style='width:10.00%' title='SHOT 1 (0-3s) , 100mm macro EXTREME CLOSE-UP, static, in front of the cabinet at the'><span class='tl-id'>S1</span><span class='tl-sec'>3s</span></div><div class='tl-seg' style='width:16.67%' title='SHOT 2 (3-8s) , 35mm WIDE, static, from the kitchen doorway'><span class='tl-id'>S2</span><span class='tl-sec'>5s</span></div><div class='tl-seg' style='width:13.33%' title='SHOT 3 (8-12s) , 85mm CLOSE-UP on IBU, static, from beside the cabinet'><span class='tl-id'>S3</span><span class='tl-sec'>4s</span></div><div class='tl-seg' style='width:10.00%' title='SHOT 4 (12-15s) , 85mm CLOSE-UP on ADIT, static, low from beside the stack of boxes'><span class='tl-id'>S4</span><span class='tl-sec'>3s</span></div><div class='tl-seg' style='width:23.33%' title='SHOT 5 (15-22s) , 35mm MEDIUM two-shot, static, from behind the floral sofa'><span class='tl-id'>S5</span><span class='tl-sec'>7s</span></div><div class='tl-seg' style='width:26.67%' title='SHOT 6 (22-30s) , 50mm MEDIUM CLOSE-UP, very slow push in, low beside the white plastic'><span class='tl-id'>S6</span><span class='tl-sec'>8s</span></div></div><pre id='vid-ep03-0' class='prompt-pre'>VIDEO STYLE &amp; FORMAT
+30-second scene in the style of a modern Indonesian short drama. ONE continuous reunion —
+a son and his mother in one room, NOT a trailer, NOT a montage — covered like a real
+film: cut between MULTIPLE camera positions, angles changing every few seconds while the
+moment flows continuously. Slow pacing with long pauses; nothing is explained.
+Naturalistic, underplayed acting — no crying, no embracing, no swelling emotion. Look:
+warm-neutral filmic colour grading, fine film grain, shallow depth of field, accurate
+Indonesian skin tones. This is a quiet family drama, NOT horror — the mother is not
+frightening, she is simply there. NOT sinetron, NO dramatic zooms, NO melodrama,
+dialogue never rushed.
+
+LANGUAGE
+All spoken dialogue in INDONESIAN (Bahasa Indonesia), Jakarta register, casual spoken
+form — not formal news-reader Indonesian. Speak the lines exactly as written in the
+breakdown below: do not translate them, do not paraphrase them, do not invent extra
+lines. The mother refers to herself as &quot;Ibu&quot;, as Indonesian mothers do. No subtitles, no
+captions, no on-screen text of any kind burned into the frame. Character names are never
+spoken aloud unless they appear inside the quotation marks.
+
+OPTICS
+Base 35mm spherical at T2.0 — natural perspective, SHALLOW depth of field. Close-ups step
+up to 85mm (FOV approx 24 degrees) for face isolation; the final medium close-up uses
+50mm. The opening detail on the photograph uses a 100mm macro. Per-shot lens is specified
+in the breakdown. No wide-angle distortion, no fisheye, no zoom moves.
+
+CAMERA
+Every cut moves to a DIFFERENT physical position — in front of the cabinet at the height
+of the photograph, in the kitchen doorway, beside the cabinet, low beside the stack of
+boxes, behind the floral sofa, and low beside the white plastic chair. Never two
+consecutive shots from the same position. One very slow push in the final shot;
+everything else locked off. No handheld shake, no orbit, no crane. No slow-motion.
+
+LIGHTING
+One large soft source: midday daylight coming through the frosted-glass sliding door,
+milky and directionless near the door, falling off quickly toward the back of the room.
+No lamps or ceiling lights on. Faces turned toward the door glow softly; faces turned
+away go into deep warm-grey shadow. The only warm note is the brown cardboard of the
+stacked boxes catching the door light. Low-key, gentle contrast, never flat front light.
+The glass of the framed photograph catches a soft reflection of the door.
+
+CRITICAL
+TWO characters only, nobody else. Both keep the exact face, hairstyle and clothing from
+their reference images in every shot. Both have a small dark mole on the LEFT cheekbone —
+keep it on both of them, in the same place, in every shot where their faces are seen. No
+face swapping, no morphing, no duplicated faces, no merging of the two faces. Accurate
+Indonesian lip-sync — only the speaking character&#x27;s mouth moves; the other stays still
+and listens.
+
+CHARACTERS (from reference images)
+ADIT [gambar_adit] — 27, faded green driver jacket with no logos, grey t-shirt, dark
+jeans, black phone pouch across the chest, facing his mother for the first time in
+years.
+IBU [gambar_ibu] — 63, faded brown batik house dress, beige cardigan, grey hair clipped
+back, wooden cane, standing in the bedroom doorway, then sitting in the white plastic
+chair by the door.
+
+LOCATION (from references)
+The living room [gambar_ruang_tengah] — Small living room of the same house, seen from
+inside. The frosted-glass sliding door fills one wall, daylight coming through it soft
+and milky. A white plastic chair placed close to the door, facing it. An old
+floral-patterned sofa pushed against the side wall, with an open doorway to the kitchen
+in the same wall. A doorway to a back bedroom hung with a faded floral curtain. Pale
+ceramic floor tiles. A low dark wooden cabinet with a single small framed photograph on
+top. Against the far wall, a waist-high stack of small brown cardboard boxes, every one
+still sealed with clear tape, none opened.
+The boxes in the stack — small brown cardboard box, roughly shoebox size, wrapped in
+clear packing tape, no labels, no printed text, no logos
+The photograph on the cabinet — small framed photograph in a thin dark wooden frame: a
+boy about ten years old in a white short-sleeved school shirt, a small dark mole on his
+left cheekbone, smiling, faded colours
+
+AUDIO
+Near silence. A clock ticking somewhere in the house, never seen. The single tap of a
+wooden cane on ceramic tile. The plastic chair creaking as she sits. Clear tape tearing
+in the last seconds. NO musical score until the final three seconds, then one soft
+sustained note on an acoustic guitar. Dialogue quiet and unhurried, with real silence
+between lines.
+
+MOVEMENT NOTE
+Ibu and Adit run on OPPOSITE rhythms. Ibu barely moves — her body is still, both hands on
+the cane, and only her eyes follow him; when she speaks she does not lean or gesture.
+Adit is the one who moves, slowly and with effort, as if each step costs him something;
+he avoids her eyes when he asks his question and looks at the boxes instead. They are
+never mirrored. When he finally sits on the floor beside her chair, it is the first time
+he sits in the whole story — it must read as giving in, not resting.
+
+SHOT BREAKDOWN
+
+SCENE [00:00-00:30] RUANG TENGAH — one continuous reunion, cut between positions:
+
+SHOT 1 (0-3s), 100mm macro EXTREME CLOSE-UP, static, in front of the cabinet at the
+height of the photograph: Adit&#x27;s thumb wipes a line of dust from the glass of the small
+framed photograph. Off-screen, the single tap of a wooden cane on ceramic tile. His thumb
+stops.
+
+SHOT 2 (3-8s), 35mm WIDE, static, from the kitchen doorway: ADIT turns from the cabinet.
+Across the room, in the bedroom doorway with the faded floral curtain pushed aside, IBU
+stands — one hand on the door frame, the other on her cane. Neither of them moves. No
+dialogue — five seconds of the clock.
+
+SHOT 3 (8-12s), 85mm CLOSE-UP on IBU, static, from beside the cabinet: soft door light on
+her face, the small dark mole on her left cheekbone. She speaks quietly, as if continuing
+a conversation that never stopped.
+
+IBU: &quot;Kamu masih nggak pernah duduk, ya.&quot;
+
+SHOT 4 (12-15s), 85mm CLOSE-UP on ADIT, static, low from beside the stack of boxes: the
+same small dark mole on his left cheekbone. His mouth opens; barely any sound comes out.
+
+ADIT (almost no voice): &quot;Bu...&quot;
+
+SHOT 5 (15-22s), 35mm MEDIUM two-shot, static, from behind the floral sofa: Adit crosses
+the room, takes her elbow, and walks her slowly to the white plastic chair by the frosted
+door. She sits; the chair creaks. He does not look at her — he looks at the stack of
+boxes.
+
+ADIT: &quot;Kenapa nggak ada yang dibuka?&quot;
+
+IBU (flat, no performed sadness): &quot;Isinya bukan yang Ibu tunggu.&quot;
+
+SHOT 6 (22-30s), 50mm MEDIUM CLOSE-UP, very slow push in, low beside the white plastic
+chair: Adit lowers himself and sits on the floor beside her chair. He pulls the top box
+from the stack, rests it on his knees, and begins to tear the clear tape. Her hand comes
+to rest on his shoulder. No dialogue — the tape tearing, then the single guitar note.
+
+The shot ends mid-tear, the box still closed — no freeze frame, no fade to black.</pre></div></div>
+</div>
+<script>
+function showTab(ep, btn) {
+  document.querySelectorAll('.ep-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('tab-' + ep);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+function copyPrompt(id, btn) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const prev = btn.innerText;
+    btn.innerText = 'Tersalin!';
+    setTimeout(() => btn.innerText = prev, 1400);
+  });
+}
+</script>
+</body>
+</html>

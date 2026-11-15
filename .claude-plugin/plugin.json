@@ -4,8 +4,11 @@
   "version": "2.0.0",
   "description": "Precision AI live-action video architecture & prompt engineering system — vertical microdrama series, short films, single scenes or trailers. Plans through 7 gated workflows with 3 approvals, enforces 25 static & semantic invariants (camera delta, lip-sync pacing, cliché filtering, token bijection, multi-location continuity), generates an interactive HTML Production Board, and provides ffmpeg-backed post-generation clip dissection.",
   "author": {
-    "name": "Roedy Rustam"
+    "name": "Roedy Rustam",
+    "url": "https://github.com/roedyrustam"
   },
+  "homepage": "https://github.com/roedyrustam/microdrama",
+  "repository": "https://github.com/roedyrustam/microdrama",
   "license": "MIT",
   "keywords": [
     "ai-video",

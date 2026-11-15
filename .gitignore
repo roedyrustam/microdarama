@@ -6,6 +6,5 @@ Thumbs.db
 *.tmp
 film/
 output/
-board.html
-assets/contoh/*/board.html
+/board.html
 .pytest_cache/
