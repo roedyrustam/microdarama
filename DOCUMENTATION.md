@@ -1,6 +1,6 @@
-# Dokumentasi Lengkap — Microdrama v2.0 (Sovereign Precision Edition)
+# Dokumentasi Lengkap — Microdrama v2.1
 
-> **Bilingual Guide (Bahasa Indonesia & English)**: Panduan lengkap untuk AI Agent, Sutradara, dan Kreator Video AI menggunakan **Microdrama v2.0**.
+> **Bilingual Guide (Bahasa Indonesia & English)**: Panduan lengkap untuk AI Agent, Sutradara, dan Kreator Video AI menggunakan **Microdrama v2.1**.
 
 ---
 
@@ -103,8 +103,11 @@ python assets/tools/dissect_video.py analyze hasil_scene1.mp4 --prompt film/alam
 | `python assets/tools/check_prompts.py <folder> [--json] [--strict]` | Validasi 25 poin integritas proyek |
 | `python assets/tools/microdrama_cli.py init <folder> --title "Judul"` | Membuat proyek baru dari template |
 | `python assets/tools/microdrama_cli.py add-ep <folder> 2 --title "Judul Ep"` | Menambah episode baru + daftar reuse otomatis |
+| `python assets/tools/microdrama_cli.py status <folder> [--json] [--strict]` | Memeriksa kesiapan Gerbang 0–7 tanpa mengubah berkas |
 | `python assets/tools/microdrama_cli.py sync <folder>` | Menyelaraskan blok cast/set terkunci & lampiran ke seluruh prompt |
-| `python assets/tools/microdrama_cli.py board <folder>` | Menghasilkan `board.html` interaktif |
+| `python assets/tools/microdrama_cli.py board <folder>` | Menghasilkan `board.html` Studio v2.1 (WPS, `@Element`, Negative Copy, Pencari 24 Gejala) |
+| `python assets/tools/microdrama_cli.py export <folder> [--out <path>] [--stdout]` | Mengekspor paket JSON terstruktur adaptor multi-model |
+| `python assets/tools/microdrama_cli.py sync-plugin [--check] [--global]` | Menyinkronkan `SKILL.md`, `agents/`, `assets/`, `references/`, & instalasi global |
 | `python assets/tools/dissect_video.py diagnose "<gejala>"` | Mencari akar masalah & perbaikan bedah 1-2 kalimat |
 | `python assets/tools/dissect_video.py analyze <mp4> --prompt <md>` | Membedah cut video via `ffmpeg` dan membandingkannya dengan timecode shot |
 | `python assets/tools/dissect_video.py branch <prompt-video.md>` | Membuat cabang perbaikan `-v2.md`, `-v3.md` tanpa menimpa versi lama |

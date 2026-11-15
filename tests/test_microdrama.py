@@ -193,12 +193,57 @@ class TestMicrodramaPrecision(unittest.TestCase):
         self.assertIn("rafa_sheet.png", ep2_aset_txt)
         self.assertIn("ruang_rapat_plate.png", ep2_aset_txt)
 
-        # Test board generation
+        # Test board generation (Studio v2.1)
         board_out = self.tmp_path / "board_out.html"
         self.assertEqual(microdrama_cli.main(["board", str(cloned), "--out", str(board_out)]), 0)
         html_txt = board_out.read_text(encoding="utf-8")
         self.assertIn("Microdrama Studio", html_txt)
         self.assertIn("Salin Prompt Video", html_txt)
+        self.assertIn("Salin Negative (Avoid)", html_txt)
+        self.assertIn("Salin Mode @Element", html_txt)
+        self.assertIn("Diagnosa Cepat 24 Gejala", html_txt)
+        self.assertIn("<th>WPS</th>", html_txt)
+
+    def test_cli_status_on_init_and_completed_project(self) -> None:
+        fresh = self.tmp_path / "status-init"
+        self.assertEqual(microdrama_cli.main(["init", str(fresh), "--title", "Uji Status"]), 0)
+        fresh_status = microdrama_cli.inspect_project_status(fresh)
+        self.assertFalse(fresh_status["ready"])
+        self.assertEqual(fresh_status["gates"][0]["status"], "PASS")
+        self.assertEqual(fresh_status["gates"][1]["status"], "PENDING")
+        self.assertEqual(fresh_status["next_gate"]["gate"], 1)
+        self.assertEqual(microdrama_cli.main(["status", str(fresh)]), 0)
+        self.assertEqual(microdrama_cli.main(["status", str(fresh), "--strict"]), 1)
+
+        completed = ROOT_DIR / "assets" / "contoh" / "alamat-yang-sama"
+        comp_status = microdrama_cli.inspect_project_status(completed)
+        self.assertTrue(comp_status["ready"])
+        self.assertTrue(all(g["status"] == "PASS" for g in comp_status["gates"]))
+        self.assertIsNone(comp_status["next_gate"])
+        self.assertEqual(microdrama_cli.main(["status", str(completed), "--strict"]), 0)
+
+    def test_cli_export_bundle(self) -> None:
+        export_out = self.tmp_path / "bundle.json"
+        alamat = ROOT_DIR / "assets" / "contoh" / "alamat-yang-sama"
+        self.assertEqual(microdrama_cli.main(["export", str(alamat), "--out", str(export_out)]), 0)
+        bundle = json.loads(export_out.read_text(encoding="utf-8"))
+        self.assertEqual(bundle["schema_version"], "microdrama.export.v1")
+        self.assertEqual(bundle["plugin_version"], "2.1.0")
+        self.assertEqual(bundle["verifier"]["status"], "ok")
+        self.assertGreaterEqual(len(bundle["episodes"]), 3)
+        ep1 = bundle["episodes"][0]
+        self.assertTrue(ep1["assets"])
+        self.assertTrue(ep1["assets"][0]["positive_prompt"])
+        self.assertTrue(ep1["assets"][0]["negative_prompt"])
+        self.assertNotIn("Avoid:", ep1["assets"][0]["negative_prompt"])
+        self.assertTrue(ep1["scenes"])
+        sc0 = ep1["scenes"][0]
+        self.assertTrue(sc0["element_slots"])
+        self.assertEqual(sc0["element_slots"][0]["slot"], 1)
+        self.assertEqual(sc0["element_slots"][0]["element"], "@Element1")
+        self.assertIn("@Element1", sc0["prompt_element_mode"])
+        self.assertNotIn("[gambar_", sc0["prompt_element_mode"])
+        self.assertTrue(any(sh["wps"] > 0 for sh in ep1["shots"]))
 
     def test_sync_repairs_placeholder_character_and_set_drift(self) -> None:
         cloned = self._clone_project("alamat-yang-sama")
@@ -231,9 +276,12 @@ class TestMicrodramaPrecision(unittest.TestCase):
         root_manifest = json.loads((ROOT_DIR / "plugin.json").read_text(encoding="utf-8"))
         claude_manifest = json.loads((ROOT_DIR / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
         self.assertEqual(root_manifest["name"], "microdrama")
+        self.assertEqual(root_manifest["version"], "2.1.0")
         self.assertEqual(root_manifest["author"]["name"], "Roedy Rustam")
         self.assertEqual(claude_manifest["name"], "microdrama")
+        self.assertEqual(claude_manifest["version"], "2.1.0")
         self.assertEqual(claude_manifest["author"]["name"], "Roedy Rustam")
+        self.assertTrue((ROOT_DIR / "agents" / "microdrama-director.md").exists())
         self.assertTrue((ROOT_DIR / "rules" / "AGENTS.md").exists())
         self.assertTrue((ROOT_DIR / "assets" / "logo.svg").exists())
         self.assertEqual(microdrama_cli.main(["sync-plugin", "--check"]), 0)

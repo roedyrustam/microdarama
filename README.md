@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="icon.svg" width="112" alt="Microdrama v2.0 icon">
+<img src="icon.svg" width="112" alt="Microdrama v2.1 icon">
 
-# Microdrama v2.0 — Sovereign Precision Edition
+# Microdrama v2.1 — Precision AI Live-Action Production System
 
-**Rancang film & microdrama AI layaknya produksi sungguhan — dengan verifikasi semantik 25-poin, sinkronisasi bible otomatis, studio produksi HTML, dan loop bedah klip pasca-generate.**
+**Rancang film & microdrama AI layaknya produksi sungguhan — dengan subagen `microdrama-director`, inspeksi 7 gerbang, verifikasi semantik 25-poin, ekspor JSON multi-model, studio produksi HTML v2.1, dan loop bedah klip pasca-generate.**
 
-[![Version](https://img.shields.io/badge/version-2.0.0-2f6fd6?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-2f6fd6?style=flat-square)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3fa34d?style=flat-square)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B%20Stdlib%20Only-1c2a4a?style=flat-square)](assets/tools/check_prompts.py)
 [![Checks](https://img.shields.io/badge/Verifier-25%20Automated%20Checks-18b981?style=flat-square)](#what-new-in-v20)
@@ -42,10 +42,15 @@ Dirancang dengan arsitektur **Sovereign Precision Edition v2.0** agar jauh lebih
      - **Validasi anti-sinkronisasi figuran** di `MOVEMENT NOTE` & **audit rubrik `konsep.md`** + **audit reuse aset lintas episode**.
    - Mendukung mode `--json` dan `--strict`.
 
-2. **CLI Produksi & Studio HTML Interaktif (`assets/tools/microdrama_cli.py`)**
+2. **CLI Produksi, Status Gerbang, JSON Export & Studio HTML v2.1 (`assets/tools/microdrama_cli.py`)**
    - `init` & `add-ep`: Scaffolding proyek baru & episode lanjutan beserta daftar aset `Pakai ulang`.
+   - `status`: Mengevaluasi kelengkapan Gerbang 0–7 (`PASS` / `PENDING` / `ERROR`) dan menunjukkan tahap berikutnya (`--json`, `--strict`).
    - `sync`: Menyinkronkan blok terkunci dari `cast.md`/`set.md` dan daftar `Lampirkan:` ke seluruh episode secara atomik — **nol drift manual**.
-   - `board`: Menghasilkan **`board.html`** — Studio Produksi lokal mode gelap yang memuat Brief, Konsep, Rubrik, Cast & Set Bible, Timeline Shot visual, Lencana Risiko, Status Checker, dan tombol **Copy Clean Prompt** sekali klik.
+   - `export`: Mengekspor paket JSON (`microdrama.export.v1`) berisi pemisahan `positive_prompt` / `negative_prompt`, pemetaan slot 1-based `@Element1..N`, dan metrik pacing `wps`.
+   - `board`: Menghasilkan **`board.html` v2.1** — Studio Produksi lokal mode gelap lengkap dengan kolom **`WPS`** (`> 3,2 k/d` ditandai), lencana slot `@Element1..N`, tombol salin **`Salin Negative (Avoid)`** & **`Salin Mode @Element`**, serta pencarian interaktif **Diagnosa Cepat 24 Gejala**.
+
+3. **Subagen Native (`agents/microdrama-director.md`)**
+   - Subagen spesialis **`microdrama-director`** untuk orkestrasi otomatis 7 Gerbang & 3 Persetujuan Wajib di Antigravity/Claude.
 
 3. **Loop Bedah Klip & Perbaikan Terarah (`assets/tools/dissect_video.py`)**
    - `diagnose "<gejala>"`: Pencarian cepat 24 gejala video cacat → akar masalah di teks → perbaikan bedah 1–2 kalimat.
@@ -87,22 +92,26 @@ python assets/tools/microdrama_cli.py init film/proyek-baru --title "Proyek Baru
 # 2. Tambah episode baru (otomatis mendeteksi aset reuse)
 python assets/tools/microdrama_cli.py add-ep film/proyek-baru 2 --title "Episode Dua"
 
-# 3. Sinkronkan blok terkunci dari cast.md & set.md ke seluruh prompt
+# 3. Periksa status Gerbang 0-7
+python assets/tools/microdrama_cli.py status assets/contoh/alamat-yang-sama
+
+# 4. Sinkronkan blok terkunci dari cast.md & set.md ke seluruh prompt
 python assets/tools/microdrama_cli.py sync assets/contoh/alamat-yang-sama
 
-# 4. Jalankan 25-point verifier
+# 5. Jalankan 25-point verifier
 python assets/tools/check_prompts.py assets/contoh/alamat-yang-sama --strict
 
-# 5. Bangun Studio Produksi Visual (board.html)
+# 6. Bangun Studio Produksi Visual (board.html v2.1) & Ekspor JSON
 python assets/tools/microdrama_cli.py board assets/contoh/alamat-yang-sama
+python assets/tools/microdrama_cli.py export assets/contoh/alamat-yang-sama --stdout
 
-# 6. Diagnosis gejala setelah generate video
+# 7. Diagnosis gejala setelah generate video
 python assets/tools/dissect_video.py diagnose "tokoh bocor ke sisi pintu"
 
-# 7. Jalankan seluruh suite pengujian
+# 8. Jalankan seluruh suite pengujian
 python -m unittest discover -s tests -v
 
-# 8. Sinkronkan paket plugin Antigravity/Claude ke instalasi global
+# 9. Sinkronkan paket plugin Antigravity/Claude ke instalasi global
 python assets/tools/microdrama_cli.py sync-plugin --global
 ```
 
@@ -111,10 +120,12 @@ python assets/tools/microdrama_cli.py sync-plugin --global
 ## Tata Letak Berkas
 
 ```text
-├── plugin.json                    # Manifes plugin Antigravity (v2.0.0)
+├── plugin.json                    # Manifes plugin Antigravity (v2.1.0)
 ├── SKILL.md                       # Instruksi master 7 gerbang untuk AI Agent
 ├── PRD.md · ERD.md · DOCUMENTATION.md
-├── .claude-plugin/                # Manifes plugin & marketplace Claude (v2.0.0)
+├── .claude-plugin/                # Manifes plugin & marketplace Claude (v2.1.0)
+├── agents/
+│   └── microdrama-director.md     # Subagen spesialis 7 Gerbang & 14 Aturan Keras
 ├── rules/
 │   └── AGENTS.md                  # Aturan aktivasi otomatis plugin Microdrama
 ├── skills/
@@ -132,7 +143,7 @@ python assets/tools/microdrama_cli.py sync-plugin --global
 │   ├── template/                # 7 kerangka kosong proyek baru
 │   ├── tools/
 │   │   ├── check_prompts.py     # Verifikator otomatis 25-poin (--json, --strict)
-│   │   ├── microdrama_cli.py    # CLI init, add-ep, sync, board.html, check
+│   │   ├── microdrama_cli.py    # CLI init, add-ep, status, sync, board.html, export, check, sync-plugin
 │   │   └── dissect_video.py     # Diagnosa 24 gejala, analisis ffmpeg, branch/promote
 │   └── contoh/
 │       ├── alamat-yang-sama/    # Proyek lengkap 3 ep × 30s (multi-plate & reuse)

@@ -1,11 +1,11 @@
-# Microdrama v2.0 — Modular Production Rules (AGENTS.md)
+# Microdrama v2.1 — Modular Production Rules (AGENTS.md)
 Author: Roedy Rustam
 
 Whenever the user asks to plan, script, verify, repair, or write prompts for a live-action AI video — including vertical microdrama series, short films, single scenes, or trailers:
 
-1. **Activate the `microdrama` Skill (`SKILL.md`)**:
-   - Read and follow `SKILL.md` together with the gate manuals in `references/`.
-   - **Never generate media directly**; output verified production markdown artifacts and local HTML studio boards (`board.html`).
+1. **Activate the `microdrama` Skill (`SKILL.md`) or Delegate to `microdrama-director`**:
+   - Read and follow `SKILL.md` together with the gate manuals in `references/`, or delegate structured multi-gate production to `agents/microdrama-director.md`.
+   - **Never generate media directly**; output verified production markdown artifacts, model-adaptive JSON bundles (`export`), and local HTML studio boards (`board.html`).
    - **Zero-Default Brief**: Never invent aspect ratio, duration, episode count, or pre-fixed shot count.
 
 2. **Enforce the 7 Production Gates & 3 Mandatory Approval Stops**:
@@ -20,5 +20,5 @@ Whenever the user asks to plan, script, verify, repair, or write prompts for a l
 3. **Enforce the 14 Hard Rules & Gate 7 Verification**:
    - Keep ratios (`9:16`, `16:9`, `vertical`, `horizontal`), fps, resolution, seed, model names, headers (`===`), and filenames outside prompt code blocks.
    - Spell out numbers as words in spoken dialogue, keep pacing `≤ 3.2` words/sec, forbid person/negation words in gap/glass peephole shots, avoid contrast words on missing objects, and split extras into 3 separate actions in `MOVEMENT NOTE` when `> 2` people appear.
-   - Always verify before handover with `python assets/tools/check_prompts.py <folder> --strict` until `Semua cek lolos.` and build the production studio with `python assets/tools/microdrama_cli.py board <folder>`.
+   - Always inspect progress with `python assets/tools/microdrama_cli.py status <folder>`, verify before handover with `python assets/tools/check_prompts.py <folder> --strict` until `Semua cek lolos.`, build Studio v2.1 via `python assets/tools/microdrama_cli.py board <folder>`, and optionally package multi-model JSON via `python assets/tools/microdrama_cli.py export <folder>`.
    - Use `python assets/tools/dissect_video.py` (`diagnose`, `analyze`, `branch`, `promote`) for post-generation clip defects.

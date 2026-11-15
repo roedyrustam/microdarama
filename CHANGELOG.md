@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.1.0 — 2026-11-16 (Director Subagent, Gate Inspector, JSON Export & Studio v2.1)
+
+**Orkestrasi subagen spesialis, inspeksi kesiapan Gerbang 0–7, paket ekspor adaptif multi-model, dan Studio Produksi HTML v2.1.**
+
+- **`agents/microdrama-director.md` (Baru)**:
+  - Menambahkan definisi subagen native Antigravity/Claude **`microdrama-director`** dengan aturan 7 Gerbang, 3 Persetujuan Wajib, Zero-Default Brief, dan 14 Aturan Keras, serta tersinkronisasi ke instalasi global lewat `sync-plugin --global`.
+- **`assets/tools/microdrama_cli.py` (`status`, `export`, & `board.html` v2.1)**:
+  - **`status <folder> [--json] [--strict]`**: Mengevaluasi kesiapan proyek di seluruh Gerbang 0–7 (`PASS` / `PENDING` / `ERROR`) dan menunjukkan gerbang berikutnya tanpa memodifikasi berkas.
+  - **`export <folder> [--out <path>] [--stdout]`**: Menghasilkan paket JSON terstruktur (`microdrama.export.v1`) berisi pemisahan `positive_prompt` vs `negative_prompt` (`Avoid:`), pemetaan slot lampiran 1-based (`@Element1..N`), varian `prompt_element_mode`, serta metrik pacing dialog (`words`, `wps` kata/detik) per shot.
+  - **`board.html` v2.1**: Menambahkan kolom **`WPS`** dengan peringatan visual amber saat `> 3,2 k/d`, tombol **`Salin Negative (Avoid)`** di kartu aset, lencana slot 1-based (`#1 file [token] (@Element1)`) + tombol **`Salin Mode @Element`** di kartu scene, serta panel pencarian interaktif **Diagnosa Cepat 24 Gejala Plot Hole** (`dissect_video.SYMPTOMS`).
+  - Memperbarui `sync-plugin` agar menyinkronkan folder `agents/` serta memperbaiki mekanisme salin JavaScript agar memakai `textContent` pada blok tersembunyi.
+- **`tests/test_microdrama.py`**: Menambahkan pengujian unit untuk subperintah `status`, `export`, fitur Studio v2.1, dan keberadaan `agents/microdrama-director.md`.
+
 ## 2.0.0 — 2026-11-16 (Sovereign Precision Edition)
 
 **Rekonstruksi presisi penuh dengan verifikasi otomatis 25 poin, sinkronisasi lintas berkas, studio produksi HTML interaktif, dan tool bedah video pasca-generate.**

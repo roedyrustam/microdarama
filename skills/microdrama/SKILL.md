@@ -2,18 +2,18 @@
 name: microdrama
 description: "Merancang konsep dan MENULIS PROMPT presisi untuk video AI live-action — microdrama vertikal berseri, short movie, atau scene/trailer tunggal — dilengkapi verifikator semantik 25-poin, CLI sinkronisasi otomatis, Studio Produksi HTML (`board.html`), dan tool bedah video pasca-generate (`dissect_video.py`). Skill ini TIDAK menggenerate media apa pun: keluarannya berkas teks terverifikasi berisi konsep cerita, cast & set bible terkunci, shot list ber-audit risiko & sumbu 180°, prompt sheet karakter 3-panel dengan nama tercetak, prompt plate set/properti, dan prompt video sebelas blok (4–30 detik per generate) yang siap di-copy ke AI gambar dan AI video mana pun. Gunakan saat user minta 'microdrama', bikin microdrama, drama pendek vertikal, short movie, film pendek AI, scene atau trailer, prompt video AI, shot list, sheet karakter, memperbaiki klip AI yang plot hole, atau melanjutkan episode seri yang sudah ada."
 author: "Roedy Rustam"
-version: "2.0.0"
+version: "2.1.0"
 license: MIT
 metadata:
   author: Roedy Rustam
   author_url: https://github.com/roedyrustam
-  version: "2.0.0"
+  version: "2.1.0"
   updated: "2026-11-16"
 ---
 
-# Microdrama v2.0 — Perancang Produksi & Penulis Prompt Video AI Presisi Tinggi
+# Microdrama v2.1 — Perancang Produksi & Penulis Prompt Video AI Presisi Tinggi
 
-**v2.0.0 (Sovereign Precision Edition) · by [Roedy Rustam](https://github.com/roedyrustam) · MIT.**
+**v2.1.0 · by [Roedy Rustam](https://github.com/roedyrustam) · MIT.**
 
 Skill ini adalah **asisten sutradara, penulis naskah, dan script supervisor otomatis — bukan generator media**. Tidak ada gambar, video, atau audio yang digenerate di sini. Keluarannya adalah berkas teks produksi terverifikasi dan studio HTML interaktif (`board.html`) agar user tinggal men-generate aset dan klip di model AI pilihannya (Kling, Seedance, Veo, Sora, Runway, Wan, GPT Image, Flux) dengan tingkat kegagalan serendah mungkin.
 
@@ -87,20 +87,25 @@ Baca `references/prompt-video.md` dan `references/model-profiles.md` (untuk cata
 - Jalankan `python assets/tools/microdrama_cli.py sync <folder>` untuk memastikan salinan blok dari `cast.md`/`set.md` dan daftar `Lampirkan:` identik 100%.
 - **Triad Lokasi Ganda:** Jika >1 plate lokasi dalam satu scene, wajib memakai: (1) Peta Referensi di awal `LOCATION`, (2) Tag lokasi `— SISI, tempat, sudut —` di tiap baris `SHOT`, dan (3) Kunci posisi di `CONTINUITY`.
 
-### 7 · VERIFIKASI, STUDIO PRODUKSI & PERBAIKAN PASCA-GENERATE
+### 7 · VERIFIKASI, STUDIO PRODUKSI, EKSPOR & PERBAIKAN PASCA-GENERATE
 Baca `references/verifikasi.md`.
-1. Jalankan **25-Point Verifier**:
+1. Periksa kesiapan seluruh gerbang (opsional saat melanjutkan proyek):
+   ```bash
+   python assets/tools/microdrama_cli.py status <folder_proyek>
+   ```
+2. Jalankan **25-Point Verifier**:
    ```bash
    python assets/tools/check_prompts.py <folder_proyek> --strict
    ```
    Perbaiki semua masalah hingga keluar `Semua cek lolos.`.
-2. Bangun **Studio Produksi Visual HTML**:
+3. Bangun **Studio Produksi Visual HTML (v2.1)** atau paket **JSON Export**:
    ```bash
    python assets/tools/microdrama_cli.py board <folder_proyek>
+   python assets/tools/microdrama_cli.py export <folder_proyek>
    ```
-   Menghasilkan `<folder_proyek>/board.html` berisi timeline shot, status cek, lencana risiko, lampiran gambar, dan tombol salin prompt bersih sekali klik.
-3. Serahkan daftar berkas, cara pakai, link `board.html`, dan catatan kelemahan jujur (jika ada).
-4. **Jika user kembali membawa klip hasil generate yang plot hole**, jalankan siklus perbaikan via `assets/tools/dissect_video.py`:
+   `board.html` kini menampilkan metrik `WPS` per shot, slot `@Element1..N`, tombol **Salin Negative (Avoid)**, tombol **Salin Mode @Element**, dan panel **Diagnosa Cepat 24 Gejala**.
+4. Serahkan daftar berkas, cara pakai, link `board.html`, dan catatan kelemahan jujur (jika ada).
+5. **Jika user kembali membawa klip hasil generate yang plot hole**, jalankan siklus perbaikan via `assets/tools/dissect_video.py`:
    - `analyze` klip dengan `ffmpeg` (titik potong & contact sheet 2 fps) dan Whisper (transkrip dialog).
    - `diagnose` akar penyebab dari 24-pola tabel gejala.
    - `branch` ke `prompt-video-v2.md`, perbaiki **1–2 kalimat bedah saja**, uji dengan rasio/model/referensi identik, atau `promote` versi terbaik kembali ke `prompt-video.md`.
@@ -131,20 +136,21 @@ Baca `references/verifikasi.md`.
 | Berkas | Fungsi |
 |---|---|
 | `PRD.md` · `ERD.md` · `DOCUMENTATION.md` | Spesifikasi arsitektur, relasi entitas-token, dan dokumentasi bilingual lengkap |
+| `agents/microdrama-director.md` | Subagen spesialis sutradara & script supervisor 7 Gerbang untuk Antigravity/Claude |
 | `assets/template/` | Kerangka kosong 7 berkas produksi (`brief`, `konsep`, `cast`, `set`, `naskah`, `prompt-aset`, `prompt-video`) |
 | `assets/tools/check_prompts.py` | Verifikator otomatis 25-poin (Python 3 stdlib, `--json`, `--strict`) |
-| `assets/tools/microdrama_cli.py` | CLI produksi (`init`, `add-ep`, `sync`, `board`, `check`) + generator `board.html` |
+| `assets/tools/microdrama_cli.py` | CLI produksi (`init`, `add-ep`, `status`, `sync`, `board`, `export`, `check`, `sync-plugin`) |
 | `assets/tools/dissect_video.py` | Tool bedah klip (`diagnose`, `analyze` ffmpeg, `branch`, `promote`) |
 | `assets/contoh/alamat-yang-sama/` | Proyek benchmark lengkap 3 episode × 30 detik (lolos 25 cek + `board.html`) |
 | `assets/contoh/unit-7/` | Proyek benchmark lengkap "Unit 7" Ep 01 (lolos 25 cek + `board.html`) |
 | `references/*.md` | 8 manual produksi per gerbang + profil deployment model (`model-profiles.md`) |
-| `tests/test_microdrama.py` | Suite pengujian unit & integrasi untuk verifier, CLI, dan dissector |
+| `tests/test_microdrama.py` | Suite pengujian unit & integrasi untuk verifier, CLI, export, dan dissector |
 
 ---
 
 ## Orchestration & Integration
 
-Skill `microdrama` terhubung langsung dengan ekosistem skill dan subagen berikut:
+Skill `microdrama` bekerja langsung bersama subagen spesialis **`microdrama-director`** dan terhubung dengan ekosistem skill berikut:
 - **`anti-slop` & `zero-tech-debt-auditor`**: Mengawal ketajaman copywriting naskah bebas klise, kebersihan UI `board.html`, dan kode Python 3 bebas dependensi.
 - **`ai-prompt-engineering-expert` & `structured-output-contracts`**: Menjamin format prompt 11-blok dan skema keluaran `--json` deterministik.
 - **`data-visualization-expert` & `senior-frontend`**: Merancang tampilan timeline visual, kartu aset, dan tombol salin studio `board.html`.

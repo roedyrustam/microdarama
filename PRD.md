@@ -1,9 +1,9 @@
-# Product Requirements Document (PRD) — Microdrama v2.0 (Sovereign Precision Edition)
+# Product Requirements Document (PRD) — Microdrama v2.1
 
 ## 1. Executive Summary
-**Microdrama** is an Agent Skill and deterministic Python 3 production toolkit for planning live-action AI video (vertical microdrama series, short films, and single scenes/trailers) and generating model-agnostic image and video prompts. Microdrama **never calls media-generation APIs**; it produces structured, cross-verified production text artifacts and an interactive local HTML production studio (`board.html`) that eliminate the core failure modes of AI video generation: identity drift, chorus-line crowd synchronization, unreadable on-screen text, spatial teleportation across cuts, trailer-montage pacing, and wasted generation credits.
+**Microdrama** is an Agent Skill, specialist subagent (`microdrama-director`), and deterministic Python 3 production toolkit for planning live-action AI video (vertical microdrama series, short films, and single scenes/trailers) and generating model-agnostic image and video prompts. Microdrama **never calls media-generation APIs**; it produces structured, cross-verified production text artifacts, model-adaptive JSON export bundles, and an interactive local HTML production studio (`board.html`) that eliminate the core failure modes of AI video generation: identity drift, chorus-line crowd synchronization, unreadable on-screen text, spatial teleportation across cuts, trailer-montage pacing, and wasted generation credits.
 
-**Microdrama v2.0** transforms manual checklist steps into automated deterministic verification (`25-point static & semantic linter`), adds a zero-dependency project scaffolder/synchronizer + visual HTML Production Board (`microdrama_cli.py`), and ships an automated `ffmpeg`/`ffprobe` cut-and-symptom repair analyzer (`dissect_video.py`).
+**Microdrama v2.1** expands the v2.0 foundation (`25-point static & semantic linter`, `microdrama_cli.py`, and `dissect_video.py`) with a dedicated `microdrama-director` subagent (`agents/microdrama-director.md`), a 7-Gate readiness inspector (`status`), a model-adaptive JSON exporter (`export`), and Production Studio v2.1 (`board.html` with WPS pacing, negative-prompt copy buttons, `@Element1..N` slot adaptation, and interactive 24-symptom diagnosis search).
 
 ---
 
@@ -53,9 +53,12 @@ python assets/tools/check_prompts.py <project_folder> [--json] [--strict]
 ### 4.2 `assets/tools/microdrama_cli.py`
 - `init <folder> [--title "<Title>"]`: Scaffolds `brief.md`, `konsep.md`, `cast.md`, `set.md` from `assets/template/`.
 - `add-ep <folder> <ep_number> [--title "<Ep Title>"]`: Scaffolds `epNN/naskah.md`, `epNN/prompt-aset.md`, `epNN/prompt-video.md` and auto-populates `Pakai ulang dari ep ...` from prior episodes.
+- `status <folder> [--json] [--strict]`: Inspects Gate 0–7 completion (`PASS` / `PENDING` / `ERROR`) and identifies the next required gate without modifying files.
 - `sync <folder>`: Propagates locked long/short blocks from `cast.md` and `set.md` into `epNN/prompt-aset.md` and `epNN/prompt-video.md`, and synchronizes `Lampirkan:` filenames from `[gambar_x]` tokens.
-- `board <folder> [--out <path>]`: Builds standalone dark-mode `board.html` with live `check_prompts` diagnostics, shot timeline, attachment badges, and one-click clean-prompt copy buttons.
+- `board <folder> [--out <path>]`: Builds standalone dark-mode `board.html` (Studio v2.1) with live `check_prompts` diagnostics, per-shot `WPS` pacing column, 1-based `@Element1..N` slot pills, one-click Copy buttons (Video, `@Element` mode, Asset, Negative `Avoid`), and interactive 24-symptom search powered by `dissect_video.SYMPTOMS`.
+- `export <folder> [--out <path>] [--stdout]`: Generates model-adaptive JSON (`microdrama.export.v1`) containing positive/negative asset splits, `@Element1..N` slot mappings, and per-shot `words`/`wps` telemetry.
 - `check <folder> [--json] [--strict]`: Wrapper invoking the 25-point verifier.
+- `sync-plugin [--check] [--global]`: Synchronizes `SKILL.md`, `assets/`, `references/`, `agents/`, and plugin metadata to `skills/microdrama/` and `~/.gemini/config/plugins/microdrama/` with SHA-256 parity verification.
 
 ### 4.3 `assets/tools/dissect_video.py`
 - `diagnose "<symptom query>"`: Queries the 24-entry symptom matrix and prints root cause + 1–2 sentence surgical prompt fix.

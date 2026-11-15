@@ -1,6 +1,6 @@
 {
   "name": "microdrama",
-  "description": "Microdrama v2.0 — Precision AI live-action video planner, 25-point prompt verifier, HTML storyboard generator, and post-generation clip dissector.",
+  "description": "Microdrama v2.1 — Precision AI live-action video planner, director subagent, 25-point prompt verifier, JSON export packager, HTML Studio v2.1, and post-generation clip dissector.",
   "owner": {
     "name": "Roedy Rustam",
     "url": "https://github.com/roedyrustam"
@@ -10,8 +10,8 @@
       "name": "microdrama",
       "source": "./",
       "displayName": "Microdrama",
-      "description": "Microdrama series, short films and single scenes planned through 7 gates with 3 approvals: concept, locked cast/set bible, shot list with 180-degree blocking & risk audit, 3-panel sheet prompts, wide-matched plates, and 11-block video prompts (4–30s). Includes 25-point semantic checker, auto-sync CLI, HTML Production Studio (board.html), and post-gen repair loop.",
-      "version": "2.0.0",
+      "description": "Microdrama series, short films and single scenes planned through 7 gates with 3 approvals: concept, locked cast/set bible, shot list with 180-degree blocking & risk audit, 3-panel sheet prompts, wide-matched plates, and 11-block video prompts (4–30s). Includes microdrama-director subagent, gate status inspector, model-adaptive JSON export, 25-point semantic checker, auto-sync CLI, HTML Production Studio v2.1 (board.html), and post-gen repair loop.",
+      "version": "2.1.0",
       "author": {
         "name": "Roedy Rustam",
         "url": "https://github.com/roedyrustam"
