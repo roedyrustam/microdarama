@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
+Thumbs.db
+*.tmp
+film/
+output/
+board.html
+assets/contoh/*/board.html
+.pytest_cache/

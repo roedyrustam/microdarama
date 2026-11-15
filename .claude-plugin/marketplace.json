@@ -1,0 +1,33 @@
+{
+  "name": "microdrama",
+  "description": "Microdrama v2.0 — Precision AI live-action video planner, 25-point prompt verifier, HTML storyboard generator, and post-generation clip dissector.",
+  "owner": {
+    "name": "Bang Tutorial"
+  },
+  "plugins": [
+    {
+      "name": "microdrama",
+      "source": "./",
+      "displayName": "Microdrama",
+      "description": "Microdrama series, short films and single scenes planned through 7 gates with 3 approvals: concept, locked cast/set bible, shot list with 180-degree blocking & risk audit, 3-panel sheet prompts, wide-matched plates, and 11-block video prompts (4–30s). Includes 25-point semantic checker, auto-sync CLI, HTML Production Studio (board.html), and post-gen repair loop.",
+      "version": "2.0.0",
+      "author": {
+        "name": "Bang Tutorial",
+        "url": "https://youtube.com/bangtutorial"
+      },
+      "homepage": "https://github.com/bangtutorial/bang-film",
+      "license": "MIT",
+      "keywords": [
+        "ai-video",
+        "microdrama",
+        "short-film",
+        "prompt-writing",
+        "shot-list",
+        "character-sheet",
+        "screenwriting",
+        "video-prompt",
+        "production-board"
+      ]
+    }
+  ]
+}
