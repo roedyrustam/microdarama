@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.2.0 — 2026-11-16 (Automated Topic Generator & GitHub Repository Optimization)
+
+**Otomatisasi pembuatan topik cerita microdrama vertikal, sinkronisasi topics GitHub repository via REST API, dan optimasi menyeluruh konfigurasi repo.**
+
+- **`assets/tools/topic_generator.py` & CLI `generate-topic` (Baru)**:
+  - Generator topik cerita microdrama vertikal otomatis mencakup 5 genre utama (*balas-dendam*, *misteri-urban*, *identitas-rahasia*, *thriller-survival*, *romansa-konflik*).
+  - Menghasilkan judul, logline, audio hook (0-3s), visual hook (0-3s), premis 3 baris, profil tokoh, set lokasi, dan pra-skor rubrik 7-poin.
+  - Subperintah `init --genre <nama_genre>`: menginisialisasi proyek baru dan langsung mengisi `brief.md` dan `konsep.md` secara otomatis tanpa placeholder kosong.
+- **`assets/tools/repo_topics.py` & CLI `repo-topics` (Baru)**:
+  - Otomatisasi pengecekan (`--check`) dan sinkronisasi (`--sync`) 20 topics kurasi, deskripsi, dan homepage repository GitHub via REST API.
+  - Dukungan fallback cerdas (urllib, Windows PowerShell `Invoke-RestMethod`, dan curl) serta deteksi token otomatis melalui `GITHUB_TOKEN`/`GH_TOKEN` dan git credential helper.
+- **Optimasi Repository & CI/CD**:
+  - Penambahan `.gitattributes` untuk normalisasi line-ending lintas platform (LF/CRLF).
+  - Ekspansi `.gitignore` untuk cakupan komprehensif artifact build, cache, test coverage, virtualenv, dan temporary OS/IDE files.
+  - Penambahan 3 pengujian unit baru di `tests/test_microdrama.py` (total 21 pengujian berstatus `OK`).
+
 ## 2.1.0 — 2026-11-16 (Director Subagent, Gate Inspector, JSON Export & Studio v2.1)
 
 **Orkestrasi subagen spesialis, inspeksi kesiapan Gerbang 0–7, paket ekspor adaptif multi-model, dan Studio Produksi HTML v2.1.**

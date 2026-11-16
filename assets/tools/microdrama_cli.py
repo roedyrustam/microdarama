@@ -35,6 +35,8 @@ if str(TOOLS_DIR) not in sys.path:
 
 import check_prompts as verifier  # noqa: E402
 import dissect_video  # noqa: E402
+import repo_topics  # noqa: E402
+import topic_generator  # noqa: E402
 
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -64,12 +66,62 @@ def cmd_init(args: argparse.Namespace) -> int:
     ep01.mkdir(parents=True, exist_ok=True)
     title = args.title or target.name.replace("-", " ").replace("_", " ").title()
 
+    topic_data = None
+    if getattr(args, "genre", None):
+        try:
+            topic_data = topic_generator.generate_topics(genre=args.genre, count=1)[0]
+            if not args.title:
+                title = topic_data["title"]
+        except Exception as exc:
+            print(f"[WARN] Gagal membuat topic otomatis untuk genre '{args.genre}': {exc}", file=sys.stderr)
+
     root_files = ["brief.md", "konsep.md", "cast.md", "set.md"]
     ep_files = ["naskah.md", "prompt-aset.md", "prompt-video.md"]
 
     for fname in root_files:
         content = (TEMPLATE_DIR / fname).read_text(encoding="utf-8")
         content = content.replace("<judul proyek>", title).replace("<judul>", title)
+        if topic_data:
+            if fname == "brief.md":
+                content = content.replace("<Microdrama seri / Short movie / Scene tunggal>", "Microdrama seri")
+                content = content.replace("<diisi user>", "9:16", 1)  # Rasio
+                content = content.replace("<diisi user, dalam detik>", "30")  # Durasi
+                content = content.replace("<diisi user; kosongkan kalau bukan seri>", "3")  # Jumlah ep
+                content = content.replace("<diisi user>", "Indonesia", 1)  # Bahasa dialog
+                content = content.replace("<diisi user>", "Live-action sinematik", 1)  # Look
+                content = content.replace("<kalimat asli user, apa adanya, jangan diparafrase>", topic_data["logline"])
+            elif fname == "konsep.md":
+                content = content.replace(
+                    "<satu kalimat: tokoh dengan satu sifat konkret — kejadian — pembalik yang penonton tahu tapi\ntokoh lain belum>",
+                    topic_data["logline"],
+                )
+                content = content.replace("<satu kalimat>", topic_data["premise_lines"][0].replace("Premis: ", ""))
+                content = content.replace("<satu hal janggal yang belum dijelaskan>", topic_data["premise_lines"][1].replace("Pemicu: ", ""))
+                content = content.replace("<satu hal yang tokoh utama selalu atau tidak pernah lakukan>", topic_data["premise_lines"][2].replace("Krisis: ", ""))
+                hook_txt = (
+                    f"1. **Audio Hook** — {topic_data['hook_audio']}\n"
+                    f"2. **Visual Hook** — {topic_data['hook_visual']}\n"
+                    "3. **Pacing Hook** — 30 detik intensif split 4-30s"
+                )
+                content = re.sub(r"1\. \*\*<nama rumus>\*\*.*\n2\. \*\*<nama rumus>\*\*.*\n3\. \*\*<nama rumus>\*\*.*", hook_txt, content)
+                content = content.replace("<diisi setelah user menjawab>", "1 (Audio Hook)")
+                rub = topic_data["rubric"]
+                content = content.replace(
+                    "Hook <n> · Spesifik <n> · Detail meleset <n> · Dialog <n> · Diam <n> · Tanam & bayar <n> ·\nAkhir <n> — rata-rata <n,n> · Konsisten Ya · Tanpa teks Ya",
+                    f"Hook {rub['hook']} · Spesifik {rub['spesifik']} · Detail meleset {rub['detail_meleset']} · Dialog {rub['dialog']} · Diam {rub['diam']} · Tanam & bayar {rub['tanam_bayar']} · Akhir {rub['akhir']} — rata-rata 4,7 · Konsisten Ya · Tanpa teks Ya",
+                )
+            elif fname == "cast.md":
+                content = content.replace(
+                    "<nama tokoh>",
+                    topic_data["char_protagonist"].split(",")[0],
+                    1,
+                )
+            elif fname == "set.md":
+                content = content.replace(
+                    "<nama set>",
+                    topic_data["sets"][0].split(" yang ")[0],
+                    1,
+                )
         (target / fname).write_text(content, encoding="utf-8")
 
     for fname in ep_files:
@@ -84,7 +136,11 @@ def cmd_init(args: argparse.Namespace) -> int:
         (ep01 / fname).write_text(content, encoding="utf-8")
 
     print(f"Proyek Microdrama diinisialisasi di: {target}")
-    print("Langkah berikutnya: isi brief.md (Gerbang 1) lalu konsep.md (Gerbang 2).")
+    if topic_data:
+        print(f"Topik otomatis diterapkan: {topic_data['title']} ({topic_data['id']}) — Genre: {args.genre}")
+        print("Langkah berikutnya: periksa cast.md & set.md lalu jalankan 'microdrama_cli.py sync'.")
+    else:
+        print("Langkah berikutnya: isi brief.md (Gerbang 1) lalu konsep.md (Gerbang 2).")
     return 0
 
 
@@ -1426,6 +1482,38 @@ def cmd_sync_plugin(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_repo_topics(args: argparse.Namespace) -> int:
+    """Automated management of GitHub repository topics and metadata."""
+    sub_argv: list[str] = []
+    if args.check:
+        sub_argv.append("--check")
+    if args.sync:
+        sub_argv.append("--sync")
+    if args.token:
+        sub_argv.extend(["--token", args.token])
+    if args.owner:
+        sub_argv.extend(["--owner", args.owner])
+    if args.repo:
+        sub_argv.extend(["--repo", args.repo])
+    if args.output_json:
+        sub_argv.append("--json")
+    return repo_topics.main(sub_argv)
+
+
+def cmd_generate_topic(args: argparse.Namespace) -> int:
+    """Generate high-retention microdrama story topics and hooks."""
+    sub_argv: list[str] = []
+    if args.genre:
+        sub_argv.extend(["--genre", args.genre])
+    if args.count:
+        sub_argv.extend(["--count", str(args.count)])
+    if args.list_genres:
+        sub_argv.append("--list-genres")
+    if args.output_json:
+        sub_argv.append("--json")
+    return topic_generator.main(sub_argv)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Microdrama v2.1 Production CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -1433,6 +1521,7 @@ def main(argv: list[str] | None = None) -> int:
     p_init = sub.add_parser("init", help="Buat proyek Microdrama baru dari template")
     p_init.add_argument("folder")
     p_init.add_argument("--title", default=None)
+    p_init.add_argument("--genre", choices=topic_generator.list_genres(), default=None, help="Terapkan topic otomatis berdasarkan genre")
     p_init.add_argument("--force", action="store_true")
 
     p_add = sub.add_parser("add-ep", help="Tambah episode baru + daftar reuse aset")
@@ -1467,6 +1556,20 @@ def main(argv: list[str] | None = None) -> int:
     p_sp.add_argument("--check", action="store_true", help="Periksa paritas SHA-256 tanpa menulis berkas")
     p_sp.add_argument("--global", dest="global_install", action="store_true", help="Sinkronkan juga ke ~/.gemini/config/plugins/microdrama")
 
+    p_rt = sub.add_parser("repo-topics", help="Otomatisasi topics & metadata GitHub repository")
+    p_rt.add_argument("--check", action="store_true", help="Periksa status keselarasan topics remote vs lokal")
+    p_rt.add_argument("--sync", action="store_true", help="Sinkronkan topics & deskripsi ke GitHub via REST API")
+    p_rt.add_argument("--token", default=None, help="GitHub Personal Access Token (opsional)")
+    p_rt.add_argument("--owner", default=repo_topics.REPO_OWNER, help="GitHub owner/org")
+    p_rt.add_argument("--repo", default=repo_topics.REPO_NAME, help="GitHub repository name")
+    p_rt.add_argument("--json", dest="output_json", action="store_true", help="Output JSON")
+
+    p_gt = sub.add_parser("generate-topic", help="Buat topik cerita microdrama & hook secara otomatis")
+    p_gt.add_argument("--genre", choices=topic_generator.list_genres(), default=None, help="Filter genre topik")
+    p_gt.add_argument("--count", type=int, default=1, help="Jumlah topik yang dibuat")
+    p_gt.add_argument("--list-genres", action="store_true", help="Tampilkan daftar genre yang tersedia")
+    p_gt.add_argument("--json", dest="output_json", action="store_true", help="Output JSON")
+
     args = parser.parse_args(argv)
     dispatch = {
         "init": cmd_init,
@@ -1477,6 +1580,8 @@ def main(argv: list[str] | None = None) -> int:
         "export": cmd_export,
         "check": cmd_check,
         "sync-plugin": cmd_sync_plugin,
+        "repo-topics": cmd_repo_topics,
+        "generate-topic": cmd_generate_topic,
     }
     return dispatch[args.command](args)
 

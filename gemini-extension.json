@@ -1,7 +1,7 @@
 {
   "name": "microdrama",
   "displayName": "Microdrama",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Precision AI live-action video architecture & prompt engineering system — vertical microdrama series, short films, single scenes or trailers with 7 gated workflows, native microdrama-director subagent, 25-point semantic verifier, JSON export packager, HTML Studio v2.1, and post-gen clip dissection.",
   "logo": "assets/logo.svg",
   "icon": "assets/logo.svg",

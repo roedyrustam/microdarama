@@ -1,15 +1,16 @@
 <div align="center">
 
-<img src="icon.svg" width="112" alt="Microdrama v2.1 icon">
+<img src="icon.svg" width="112" alt="Microdrama v2.2 icon">
 
-# Microdrama v2.1 — Precision AI Live-Action Production System
+# Microdrama v2.2 — Precision AI Live-Action Production System
 
-**Rancang film & microdrama AI layaknya produksi sungguhan — dengan subagen `microdrama-director`, inspeksi 7 gerbang, verifikasi semantik 25-poin, ekspor JSON multi-model, studio produksi HTML v2.1, dan loop bedah klip pasca-generate.**
+**Rancang film & microdrama AI layaknya produksi sungguhan — dengan generator topic otomatis, subagen `microdrama-director`, inspeksi 7 gerbang, verifikasi semantik 25-poin, ekspor JSON multi-model, studio produksi HTML v2.1, dan sinkronisasi otomatis topics repository.**
 
-[![Version](https://img.shields.io/badge/version-2.1.0-2f6fd6?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.0-2f6fd6?style=flat-square)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3fa34d?style=flat-square)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B%20Stdlib%20Only-1c2a4a?style=flat-square)](assets/tools/check_prompts.py)
-[![Checks](https://img.shields.io/badge/Verifier-25%20Automated%20Checks-18b981?style=flat-square)](#what-new-in-v20)
+[![Checks](https://img.shields.io/badge/Verifier-25%20Automated%20Checks-18b981?style=flat-square)](#peningkatan-utama-v20)
+[![GitHub Topics](https://img.shields.io/badge/GitHub%20Topics-20%20Curated-blueviolet?style=flat-square)](https://github.com/roedyrustam/microdarama)
 
 [Kenapa Microdrama](#kenapa-microdrama) · [Peningkatan v2.0](#peningkatan-utama-v20) · [Alur 7 Gerbang](#alur-kerja-7-gerbang) · [Quick Start CLI](#quick-start-cli) · [Arsitektur](#tata-letak-berkas)
 
@@ -86,32 +87,37 @@ Dirancang dengan arsitektur **Sovereign Precision Edition v2.0** agar jauh lebih
 Tanpa dependensi Python eksternal (cukup Python 3.10+):
 
 ```bash
-# 1. Buat proyek baru
-python assets/tools/microdrama_cli.py init film/proyek-baru --title "Proyek Baru"
+# 1. Buat topik cerita microdrama & inisialisasi proyek instan
+python assets/tools/microdrama_cli.py generate-topic --genre misteri-urban
+python assets/tools/microdrama_cli.py init film/proyek-baru --genre misteri-urban
 
-# 2. Tambah episode baru (otomatis mendeteksi aset reuse)
+# 2. Periksa & sinkronkan 20 topics GitHub repository secara otomatis
+python assets/tools/microdrama_cli.py repo-topics --check
+python assets/tools/microdrama_cli.py repo-topics --sync
+
+# 3. Tambah episode baru (otomatis mendeteksi aset reuse)
 python assets/tools/microdrama_cli.py add-ep film/proyek-baru 2 --title "Episode Dua"
 
-# 3. Periksa status Gerbang 0-7
+# 4. Periksa status Gerbang 0-7
 python assets/tools/microdrama_cli.py status assets/contoh/alamat-yang-sama
 
-# 4. Sinkronkan blok terkunci dari cast.md & set.md ke seluruh prompt
+# 5. Sinkronkan blok terkunci dari cast.md & set.md ke seluruh prompt
 python assets/tools/microdrama_cli.py sync assets/contoh/alamat-yang-sama
 
-# 5. Jalankan 25-point verifier
+# 6. Jalankan 25-point verifier
 python assets/tools/check_prompts.py assets/contoh/alamat-yang-sama --strict
 
-# 6. Bangun Studio Produksi Visual (board.html v2.1) & Ekspor JSON
+# 7. Bangun Studio Produksi Visual (board.html v2.1) & Ekspor JSON
 python assets/tools/microdrama_cli.py board assets/contoh/alamat-yang-sama
 python assets/tools/microdrama_cli.py export assets/contoh/alamat-yang-sama --stdout
 
-# 7. Diagnosis gejala setelah generate video
+# 8. Diagnosis gejala setelah generate video
 python assets/tools/dissect_video.py diagnose "tokoh bocor ke sisi pintu"
 
-# 8. Jalankan seluruh suite pengujian
+# 9. Jalankan seluruh suite pengujian (21 pengujian lolos)
 python -m unittest discover -s tests -v
 
-# 9. Sinkronkan ke Gemini (Antigravity / Gemini CLI) & ChatGPT / OpenAI Codex global
+# 10. Sinkronkan ke Gemini (Antigravity / Gemini CLI) & ChatGPT / OpenAI Codex global
 python assets/tools/microdrama_cli.py sync-plugin --global
 ```
 

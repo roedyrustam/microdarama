@@ -13,6 +13,8 @@ if str(TOOLS_DIR) not in sys.path:
 import microdrama_cli  # noqa: E402
 import check_prompts  # noqa: E402
 import dissect_video  # noqa: E402
+import repo_topics  # noqa: E402
+import topic_generator  # noqa: E402
 
 
 class TestMicrodramaPrecision(unittest.TestCase):
@@ -279,7 +281,7 @@ class TestMicrodramaPrecision(unittest.TestCase):
         codex_manifest = json.loads((ROOT_DIR / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
         for manifest in (root_manifest, claude_manifest, gemini_manifest, codex_manifest):
             self.assertEqual(manifest["name"], "microdrama")
-            self.assertEqual(manifest["version"], "2.1.0")
+            self.assertEqual(manifest["version"], "2.2.0")
             self.assertEqual(manifest["author"]["name"], "Roedy Rustam")
         self.assertTrue((ROOT_DIR / "agents" / "microdrama-director.md").exists())
         self.assertTrue((ROOT_DIR / "rules" / "AGENTS.md").exists())
@@ -287,6 +289,34 @@ class TestMicrodramaPrecision(unittest.TestCase):
         self.assertTrue((ROOT_DIR / ".codex" / "rules" / "microdrama.md").exists())
         self.assertTrue((ROOT_DIR / "assets" / "logo.svg").exists())
         self.assertEqual(microdrama_cli.main(["sync-plugin", "--check"]), 0)
+
+    def test_topic_generator_presets_and_cli(self) -> None:
+        genres = topic_generator.list_genres()
+        self.assertIn("misteri-urban", genres)
+        self.assertIn("balas-dendam", genres)
+        topics = topic_generator.generate_topics(genre="balas-dendam", count=1)
+        self.assertEqual(len(topics), 1)
+        self.assertTrue(topics[0]["logline"])
+        self.assertEqual(len(topics[0]["premise_lines"]), 3)
+        self.assertEqual(microdrama_cli.main(["generate-topic", "--genre", "misteri-urban"]), 0)
+
+    def test_init_with_automatic_topic_generation(self) -> None:
+        target = self.tmp_path / "auto-topic-proj"
+        self.assertEqual(microdrama_cli.main(["init", str(target), "--genre", "misteri-urban"]), 0)
+        brief_txt = (target / "brief.md").read_text(encoding="utf-8")
+        konsep_txt = (target / "konsep.md").read_text(encoding="utf-8")
+        self.assertNotIn("<diisi user>", brief_txt)
+        self.assertIn("Topik:", brief_txt)
+        self.assertIn("Audio Hook", konsep_txt)
+
+    def test_repo_topics_curated_list(self) -> None:
+        curated = repo_topics.get_curated_topics()
+        self.assertEqual(len(curated), 20)
+        self.assertIn("microdrama", curated)
+        self.assertIn("ai-video", curated)
+        for t in curated:
+            self.assertEqual(t, t.lower())
+            self.assertLessEqual(len(t), 35)
 
 
 if __name__ == "__main__":

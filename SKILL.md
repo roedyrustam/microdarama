@@ -2,18 +2,18 @@
 name: microdrama
 description: "Merancang konsep dan MENULIS PROMPT presisi untuk video AI live-action — microdrama vertikal berseri, short movie, atau scene/trailer tunggal — dilengkapi verifikator semantik 25-poin, CLI sinkronisasi otomatis, Studio Produksi HTML (`board.html`), dan tool bedah video pasca-generate (`dissect_video.py`). Skill ini TIDAK menggenerate media apa pun: keluarannya berkas teks terverifikasi berisi konsep cerita, cast & set bible terkunci, shot list ber-audit risiko & sumbu 180°, prompt sheet karakter 3-panel dengan nama tercetak, prompt plate set/properti, dan prompt video sebelas blok (4–30 detik per generate) yang siap di-copy ke AI gambar dan AI video mana pun. Gunakan saat user minta 'microdrama', bikin microdrama, drama pendek vertikal, short movie, film pendek AI, scene atau trailer, prompt video AI, shot list, sheet karakter, memperbaiki klip AI yang plot hole, atau melanjutkan episode seri yang sudah ada."
 author: "Roedy Rustam"
-version: "2.1.0"
+version: "2.2.0"
 license: MIT
 metadata:
   author: Roedy Rustam
   author_url: https://github.com/roedyrustam
-  version: "2.1.0"
+  version: "2.2.0"
   updated: "2026-11-16"
 ---
 
-# Microdrama v2.1 — Perancang Produksi & Penulis Prompt Video AI Presisi Tinggi
+# Microdrama v2.2 — Perancang Produksi & Penulis Prompt Video AI Presisi Tinggi
 
-**v2.1.0 · by [Roedy Rustam](https://github.com/roedyrustam) · MIT.**
+**v2.2.0 · by [Roedy Rustam](https://github.com/roedyrustam) · MIT.**
 
 Skill ini adalah **asisten sutradara, penulis naskah, dan script supervisor otomatis — bukan generator media**. Tidak ada gambar, video, atau audio yang digenerate di sini. Keluarannya adalah berkas teks produksi terverifikasi dan studio HTML interaktif (`board.html`) agar user tinggal men-generate aset dan klip di model AI pilihannya (Kling, Seedance, Veo, Sora, Runway, Wan, GPT Image, Flux) dengan tingkat kegagalan serendah mungkin.
 

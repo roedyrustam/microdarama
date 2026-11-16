@@ -1,14 +1,14 @@
 {
   "name": "microdrama",
   "displayName": "Microdrama",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Precision AI live-action video architecture & prompt engineering system — vertical microdrama series, short films, single scenes or trailers with 7 gated workflows, native microdrama-director subagent, 7-Gate status inspector, JSON export packager, 25-point semantic verifier, HTML Production Studio (board.html v2.1), and post-gen clip dissection.",
   "author": {
     "name": "Roedy Rustam",
     "url": "https://github.com/roedyrustam"
   },
-  "homepage": "https://github.com/roedyrustam/microdrama",
-  "repository": "https://github.com/roedyrustam/microdrama",
+  "homepage": "https://github.com/roedyrustam/microdarama",
+  "repository": "https://github.com/roedyrustam/microdarama",
   "logo": "assets/logo.svg",
   "suggestedPrompts": [
     "Buat microdrama vertikal baru dari awal melalui 7 gerbang produksi",
